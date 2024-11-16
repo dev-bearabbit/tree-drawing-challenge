@@ -1,3 +1,5 @@
+import * as __wbg_star0 from './snippets/christmas-tree-80810a3647a60caf/inline0.js';
+
 let wasm;
 
 const cachedTextDecoder = (typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { ignoreBOM: true, fatal: true }) : { decode: () => { throw Error('TextDecoder not available') } } );
@@ -176,7 +178,7 @@ function makeClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_20(arg0, arg1, arg2) {
-    wasm.closure157_externref_shim(arg0, arg1, arg2);
+    wasm.closure254_externref_shim(arg0, arg1, arg2);
 }
 
 function makeMutClosure(arg0, arg1, dtor, f) {
@@ -208,7 +210,7 @@ function __wbg_adapter_23(arg0, arg1) {
 }
 
 function __wbg_adapter_26(arg0, arg1, arg2) {
-    wasm.closure226_externref_shim(arg0, arg1, arg2);
+    wasm.closure323_externref_shim(arg0, arg1, arg2);
 }
 
 function isLikeNone(x) {
@@ -638,16 +640,16 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper1972 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 158, __wbg_adapter_20);
+    imports.wbg.__wbindgen_closure_wrapper2535 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 255, __wbg_adapter_20);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper3075 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 218, __wbg_adapter_23);
+    imports.wbg.__wbindgen_closure_wrapper3648 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 315, __wbg_adapter_23);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper3209 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 227, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper3782 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 324, __wbg_adapter_26);
         return ret;
     };
     imports.wbg.__wbindgen_init_externref_table = function() {
@@ -660,6 +662,7 @@ function __wbg_get_imports() {
         table.set(offset + 3, false);
         ;
     };
+    imports['./snippets/christmas-tree-80810a3647a60caf/inline0.js'] = __wbg_star0;
 
     return imports;
 }

@@ -1,8 +1,10 @@
 
+mod func;
+mod app;
 mod component;
-mod logic;
+mod lottie;
 
-use component::TreeDrawingChallenge;
+use app::TreeDrawingChallenge;
 
 fn main() {
     yew::Renderer::<TreeDrawingChallenge>::new().render();

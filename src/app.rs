@@ -1,7 +1,11 @@
 use yew::prelude::*;
 use web_sys::TouchEvent;
 use gloo::timers::callback::{Timeout, Interval};
-use crate::logic::{get_touch_position, calculate_score};
+use crate::func::{get_touch_position, calculate_score};
+use crate::component::start_screen::StartScreen;
+use crate::component::drawing_screen::DrawingScreen;
+use crate::component::result_screen::ResultScreen;
+use crate::lottie::start_snow_animation;
 
 pub struct TreeDrawingChallenge {
     circles: Vec<(f64, f64)>, // 사용자가 그린 경로를 원으로 연결
@@ -14,6 +18,12 @@ pub struct TreeDrawingChallenge {
     remaining_time: f64,
     svg_ref: NodeRef,
     is_drawing: bool,
+    game_state: GameState, // 화면 상태 추가
+}
+pub enum GameState {
+    StartScreen,
+    DrawingScreen,
+    ResultScreen,
 }
 
 pub enum Msg {
@@ -23,30 +33,30 @@ pub enum Msg {
     EndDraw,
     StopDraw,
     CalculateScore,
-    UpdateTime,
+    UpdateTime
 }
 
 impl Component for TreeDrawingChallenge {
     type Message = Msg;
     type Properties = ();
 
+    fn rendered(&mut self, _ctx: &Context<Self>, _first_render: bool) {
+        start_snow_animation(); // 렌더링 후 애니메이션 시작
+    }
+
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             circles: vec![],
             last_position: None,
             pattern: vec![
-                (100.0, 20.0),  // 트리 꼭대기
-                (60.0, 80.0),   // 상단 왼쪽
-                (80.0, 80.0),  // 상단 오른쪽
-                (40.0, 140.0),  // 중간 왼쪽
-                (60.0, 140.0), // 중간 
-                (20.0, 200.0),  // 하단 왼쪽
-                (180.0, 200.0), // 하단 밑선
-                (140.0, 140.0),  // 중간 오른쪽
-                (160.0, 140.0),  // 중간 오른쪽
-                (120.0, 80.0),  // 상단 오른쪽
-                (140.0, 80.0),  // 상단 오른쪽
-                (100.0, 20.0),  // 트리 꼭대기
+                (100.0, 60.0),  // 트리 꼭대기
+                (40.0, 160.0),   // 오른쪽
+                (60.0, 160.0),  // 오른쪽
+                (20.0, 240.0),  // 밑바닥
+                (180.0, 240.0), // 밑바닥
+                (140.0, 160.0),  // 왼쪽
+                (160.0, 160.0),  // 왼쪽
+                (100.0, 60.0),  // 트리 꼭대기
             ],
             score: None,
             timer: None,
@@ -55,6 +65,7 @@ impl Component for TreeDrawingChallenge {
             remaining_time: 5000.0,
             svg_ref: NodeRef::default(),
             is_drawing: false,
+            game_state: GameState::StartScreen
         }
     }
 
@@ -66,13 +77,14 @@ impl Component for TreeDrawingChallenge {
                 self.score = None;
                 self.remaining_time = 5000.0;
                 self.is_drawing = true;
+                self.game_state = GameState::DrawingScreen;
 
                 let link = ctx.link().clone();
                 self.timer = Some(Timeout::new(5000, move || link.send_message(Msg::StopDraw)));
 
                 let link = ctx.link().clone();
                 self.countdown = Some(Interval::new(50, move || link.send_message(Msg::UpdateTime)));
-
+                
                 true
             }
             Msg::StartDraw(event) => {
@@ -113,6 +125,7 @@ impl Component for TreeDrawingChallenge {
                 self.timer = None;
                 self.countdown = None;
                 self.draw_interval = None;
+                self.game_state = GameState::ResultScreen;
                 ctx.link().send_message(Msg::CalculateScore);
                 true
             }
@@ -134,47 +147,59 @@ impl Component for TreeDrawingChallenge {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let svg_ref_clone = self.svg_ref.clone();
-        let start_game = ctx.link().callback(|_| Msg::StartGame);
-        let start_draw = ctx.link().callback(move |event: TouchEvent| Msg::StartDraw(event));
-        let update_draw_position = ctx.link().callback(move |event: TouchEvent| Msg::UpdateDrawPosition(event));
-        let end_draw = ctx.link().callback(|_| Msg::EndDraw);
-
         html! {
-            <div class="game-container">
-                <div class="header">
-                    <h1>{ "Tree Drawing Challenge" }</h1>
-                    <button onclick={start_game} disabled={self.is_drawing} class="start-button">{ "Start" }</button>
-                </div>
-                <svg
-                    ref={svg_ref_clone}
-                    width="100%"
-                    height="300"
-                    ontouchstart={start_draw}
-                    ontouchmove={update_draw_position}
-                    ontouchend={end_draw}
-                    class="drawing-area"
-                >
-                    <polyline
-                    points={self.pattern.iter().map(|(x, y)| format!("{},{}", x, y)).collect::<Vec<_>>().join(" ")}
-                    stroke="green"
-                    stroke-width="5"
-                    fill="none"
-                />
-                    
-                    { for self.circles.iter().map(|(x, y)| html! {
-                        <circle cx={format!("{}", x)} cy={format!("{}", y)} r="5" fill="blue" />
-                    })}
-                </svg>
-                <div class="info-panel">
-                    <p>{ format!("Time remaining: {:.2} seconds", self.remaining_time / 1000.0) }</p>
-                    { if let Some(score) = self.score {
-                        html! { <p class="score">{ format!("Your Score: {}", score) }</p> }
-                    } else {
-                        html! {}
-                    }}
-                </div>
-            </div>
+            <>
+                // 항상 표시되는 눈 효과 요소
+                <div id="lottie-snow-effect" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden; /* 넘치는 부분 잘라내기 */
+                pointer-events: none;
+                z-index: 9999;
+            "></div>
+
+                // 게임 상태에 따른 화면 전환 로직
+                {
+                    match self.game_state {
+                        GameState::StartScreen => {
+                            let start_game = ctx.link().callback(|_| Msg::StartGame);
+                            html! { <StartScreen on_start={start_game} pattern={self.pattern.clone()} /> }
+                        }
+                        GameState::DrawingScreen => {
+                            let start_draw = ctx.link().callback(move |event: TouchEvent| Msg::StartDraw(event));
+                            let update_draw_position = ctx.link().callback(move |event: TouchEvent| Msg::UpdateDrawPosition(event));
+                            let end_draw = ctx.link().callback(|_| Msg::EndDraw);
+
+                            html! {
+                                <DrawingScreen 
+                                    remaining_time={self.remaining_time} 
+                                    svg_ref={self.svg_ref.clone()}
+                                    pattern={self.pattern.clone()}
+                                    circles={self.circles.clone()}
+                                    on_start_draw={start_draw}
+                                    on_update_draw={update_draw_position}
+                                    on_end_draw={end_draw}
+                                />
+                            }
+                        }
+                        GameState::ResultScreen => {
+                            let retry = ctx.link().callback(|_| Msg::StartGame);
+
+                            html! {
+                                <ResultScreen 
+                                    score={self.score.unwrap_or(0)} 
+                                    pattern={self.pattern.clone()} 
+                                    circles={self.circles.clone()} 
+                                    on_retry={retry} 
+                                />
+                            }
+                        }
+                    }
+                }
+            </>
         }
     }
 }
