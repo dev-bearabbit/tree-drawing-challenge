@@ -16,7 +16,6 @@ pub fn start_screen(props: &StartScreenProps) -> Html {
                 </h1>
                 <p>{ "5초 안에 트리를 그려보세요!" }</p>
             </div>
-
             <div class="tree-container">
 
                 <svg class="star" viewBox="0 0 52 49" preserveAspectRatio="xMidYMin" fill="none" xmlns="http://www.w3.org/2000/svg">

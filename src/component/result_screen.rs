@@ -21,10 +21,29 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
     html! {
         <div class="screen">
 
-            <div class="sentence">
+            <div class="result-sentence">
                 <h3>{ "친구에게 도전장을 보내보세요!" }</h3>
-                <h1>{ format!("내 트리는 {}점", props.score) }</h1>
             </div>
+
+            <div class="score">
+                <svg class="score-background" viewBox="0 0 125 67" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" 
+                        d="M8 0C3.58172 0 0 3.58172 0 8V48C0 52.4183 3.58172 56 8 56H53.3397L58.5359 65C60.0755 67.6667 63.9245 67.6667 65.4641 65L70.6603 56H117C121.418 56 125 52.4183 125 48V8C125 3.58172 121.418 0 117 0H8Z" 
+                        fill="#D9D9D9" />
+                    <path fill-rule="evenodd" clip-rule="evenodd" 
+                        d="M8 0C3.58172 0 0 3.58172 0 8V48C0 52.4183 3.58172 56 8 56H53.3397L58.5359 65C60.0755 67.6667 63.9245 67.6667 65.4641 65L70.6603 56H117C121.418 56 125 52.4183 125 48V8C125 3.58172 121.418 0 117 0H8Z" 
+                        fill="url(#paint0_linear_5_8)" />
+                    <defs>
+                    <@{"linearGradient"} id="paint0_linear_5_8" x1="31.0157" y1="-48.9452" x2="161.433" y2="65.9978" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF983" />
+                        <stop offset="0.585" stop-color="#83FFF1" />
+                        <stop offset="0.955" stop-color="#8389FF" />
+                    </@>
+                    </defs>
+                </svg>
+                <div class="score-text">{ format!("{}점", props.score) }</div>
+            </div>
+
 
             <div class="tree-container">
 

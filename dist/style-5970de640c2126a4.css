@@ -24,22 +24,7 @@ body, html {
     align-items: center;
     gap: 2vh; /* 요소 간의 간격을 뷰포트 높이에 비례 */
     text-align: center;
-    aspect-ratio: 9 / 16;
 }
-
-
-/* drawing_pattern은 크기 설정을 제거 */
-.drawing-pattern {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1vh; /* star와 tree 간의 간격 */
-    width: auto;
-    height: auto;
-}
-
-/* 아래부터는 확실한 설정 */
 
 .tree-container {
     display: flex;
@@ -50,9 +35,8 @@ body, html {
     height: auto; /* 높이는 내용에 따라 */
     max-height: 60vh;
     gap: 1vh; /* star와 tree-pattern 간격 */
-    margin-top: 10vh; /* 위 글자들과의 간격 */
-    margin-bottom: 5vh;
     pointer-events: auto;
+    margin-top: 5vh
 }
 
 /* 반응형 SVG 스타일 */
@@ -130,6 +114,50 @@ body, html {
     line-height: 1.2;
 }
 
+.result-sentence {
+    position: absolute; /* 위치를 고정 */
+    top: 5vh;
+    left: 0;
+    right: 0;
+    text-align: center; /* 중앙 정렬 */
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.result-sentence h3 {
+    font-size: calc(2vw + 0.7rem);
+    color: white;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.score {
+    position: relative;
+    z-index: 2; /* 다른 요소 위에 표시 */
+    margin-top: 0;
+}
+
+.score .score-background {
+    position: absolute; /* 배경 SVG 위치 */
+    top: 50%; /* 부모의 중앙 */
+    left: 50%; /* 부모의 중앙 */
+    transform: translate(-50%, -50%); /* 정확한 중앙 정렬 */
+    width: 125px; /* SVG 크기 */
+    height: 70px; /* SVG 높이 */
+}
+
+.score .score-text {
+    position: absolute; /* 텍스트를 배경 SVG 위에 배치 */
+    top: 50%; /* 부모의 중앙 */
+    left: 50%; /* 부모의 중앙 */
+    transform: translate(-50%, -60%); /* 정확한 중앙 정렬 */
+    font-size: 1.8rem; /* 텍스트 크기 */
+    font-weight: bold; /* 텍스트 굵게 */
+    color: black; /* 텍스트 색상 */
+    text-align: center; /* 텍스트 정렬 */
+    white-space: nowrap;
+}
 
 .start-button {
     position: fixed;

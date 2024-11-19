@@ -46,7 +46,7 @@ impl TreeDrawingChallenge {
         self.remaining_time = duration;
 
         let link = ctx.link().clone();
-        self.countdown = Some(Interval::new(10, move || {
+        self.countdown = Some(Interval::new(50, move || {
             let now = Self::get_now();
             let elapsed = now - start_time;
             let remaining = (duration - elapsed).max(0.0);
@@ -115,10 +115,16 @@ impl Component for TreeDrawingChallenge {
                         .unwrap_or(false);
                     let is_touch_device = has_touch_event || navigator.max_touch_points() > 0;
             
+                    // 플랫폼 확인
+                    let platform = navigator.platform().unwrap_or_default();
+                    let is_ipad = platform.contains("iPad") // iPad 플랫폼 명시적 감지
+                        || (platform == "MacIntel" && is_touch_device); // 터치 가능한 Mac은 iPadOS일 가능성
+
                     // 모바일 키워드 확인
                     let is_mobile = user_agent.contains("iPhone")
                         || user_agent.contains("Android")
-                        || user_agent.contains("Mobile");
+                        || user_agent.contains("Mobile")
+                        || is_ipad;
             
                     self.is_mobile = Some(is_mobile && is_touch_device);
             
