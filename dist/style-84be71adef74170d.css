@@ -152,7 +152,7 @@ body, html {
     top: 50%; /* 부모의 중앙 */
     left: 50%; /* 부모의 중앙 */
     transform: translate(-50%, -60%); /* 정확한 중앙 정렬 */
-    font-size: 1.8rem; /* 텍스트 크기 */
+    font-size: 2rem; /* 텍스트 크기 */
     font-weight: bold; /* 텍스트 굵게 */
     color: black; /* 텍스트 색상 */
     text-align: center; /* 텍스트 정렬 */
