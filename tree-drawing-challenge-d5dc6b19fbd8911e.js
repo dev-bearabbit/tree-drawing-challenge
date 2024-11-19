@@ -1,4 +1,4 @@
-import * as __wbg_star0 from './snippets/christmas-tree-80810a3647a60caf/inline0.js';
+import * as __wbg_star0 from './snippets/tree-drawing-challenge-dcbad4a322540404/inline0.js';
 
 let wasm;
 
@@ -181,7 +181,7 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_20(arg0, arg1) {
-    wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h265231f4105ee37e(arg0, arg1);
+    wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3ccaeea1d8dbbc96(arg0, arg1);
 }
 
 function makeClosure(arg0, arg1, dtor, f) {
@@ -684,7 +684,7 @@ function __wbg_get_imports() {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
     imports.wbg.__wbindgen_closure_wrapper206 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 83, __wbg_adapter_20);
+        const ret = makeMutClosure(arg0, arg1, 84, __wbg_adapter_20);
         return ret;
     };
     imports.wbg.__wbindgen_closure_wrapper329 = function(arg0, arg1, arg2) {
@@ -705,7 +705,7 @@ function __wbg_get_imports() {
         table.set(offset + 3, false);
         ;
     };
-    imports['./snippets/christmas-tree-80810a3647a60caf/inline0.js'] = __wbg_star0;
+    imports['./snippets/tree-drawing-challenge-dcbad4a322540404/inline0.js'] = __wbg_star0;
 
     return imports;
 }
@@ -763,7 +763,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('christmas-tree_bg.wasm', import.meta.url);
+        module_or_path = new URL('tree-drawing-challenge_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
