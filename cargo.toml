@@ -12,4 +12,4 @@ yew = { version = "0.21.0", features = ["csr"] }
 
 [dependencies.web-sys]
 version = "0.3.72"
-features = ["console", "EventTarget", "Window", "Navigator","DomRect", "Element", "SvgsvgElement", "HtmlElement", "TouchEvent", "TouchList", "Touch"]
+features = ["console", "EventTarget", "Window", "Performance", "Navigator","DomRect", "Element", "SvgsvgElement", "HtmlElement", "TouchEvent", "TouchList", "Touch"]

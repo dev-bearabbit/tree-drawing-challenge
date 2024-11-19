@@ -22,6 +22,11 @@ pub fn get_touch_position(event: &TouchEvent, svg_ref: &NodeRef) -> Option<(f64,
 pub fn calculate_score(user_path: &[(f64, f64)], pattern: &[(f64, f64)]) -> u32 {
     let mut total_distance = 0.0;
 
+    if user_path.is_empty() {
+        // 아무 것도 그리지 않았을 경우 0점 반환
+        return 0;
+    }
+
     for (user_point, pattern_point) in user_path.iter().zip(pattern.iter()) {
         let dx = user_point.0 - pattern_point.0;
         let dy = user_point.1 - pattern_point.1;
@@ -39,8 +44,8 @@ pub fn calculate_score(user_path: &[(f64, f64)], pattern: &[(f64, f64)]) -> u32 
 pub fn format_time(milliseconds: f64) -> String {
     let total_seconds = (milliseconds / 1000.0).floor() as u32; // 밀리초를 초로 변환
     let seconds = total_seconds % 60; // 초 계산
-    let millis = (milliseconds % 1000.0).round() as u32; // 남은 밀리초 계산
+    let millis = ((milliseconds % 1000.0) / 10.0).round() as u32; // 밀리초를 두 자리로 변환
 
     // 두 자리로 포맷팅: "04 : 35" 형식
-    format!("{:02} : {:02}", seconds, millis % 100)
+    format!("{:02} : {:02}", seconds, millis)
 }

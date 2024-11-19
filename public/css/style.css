@@ -52,6 +52,7 @@ body, html {
     gap: 1vh; /* star와 tree-pattern 간격 */
     margin-top: 10vh; /* 위 글자들과의 간격 */
     margin-bottom: 5vh;
+    pointer-events: auto;
 }
 
 /* 반응형 SVG 스타일 */
@@ -59,7 +60,6 @@ body, html {
     width: 20vw; /* 디바이스 너비의 20% */
     max-width: 100px; /* 최대 크기 제한 */
     height: auto;
-    pointer-events: none;
 }
 
 /* star의 추가 스타일 */
@@ -69,21 +69,30 @@ body, html {
     max-height: 100px; /* 최대 크기 제한 */
 }
 
+.tree-container .star-yellow {
+    width: 13vw; /* 뷰포트 너비에 따라 동적 조정 */
+    max-width: 100px; /* 최대 크기 제한 */
+    max-height: 100px; /* 최대 크기 제한 */
+    filter: drop-shadow(0 0 10px #FFF983) drop-shadow(0 0 20px #FFF983);
+}
+
 /* tree-pattern의 추가 스타일 */
 .tree-container .tree-pattern {
     width: 65vw; /* 뷰포트 너비의 80% */
     max-width: 400px; /* 최대 크기 제한 */
     height: auto;
     pointer-events: auto;
+    overflow: visible;
+    position: relative;
 }
 
 /* timer 위치 */
 .tree-container .timer {
     position: absolute;
-    top: 70%; /* 상단으로부터 50% */
+    top: 65vh; /* 상단으로부터 50% */
     left: 50%; /* 왼쪽으로부터 50% */
     transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
-    font-size: 2rem; /* 적절한 크기 설정 */
+    font-size: calc(2vw + 1.5rem);; /* 적절한 크기 설정 */
     color: white;
     text-align: center;
 }

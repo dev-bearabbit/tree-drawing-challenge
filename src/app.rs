@@ -34,8 +34,44 @@ pub enum Msg {
     UpdateDrawPosition(TouchEvent),
     StopDraw,
     CalculateScore,
-    UpdateTime,
+    UpdateTime(f64),
     DetectDevice,
+}
+
+impl TreeDrawingChallenge {
+    /// 타이머 시작
+    fn start_timer(&mut self, ctx: &Context<Self>, duration: f64) {
+        let start_time = Self::get_now();
+
+        self.remaining_time = duration;
+
+        let link = ctx.link().clone();
+        self.countdown = Some(Interval::new(10, move || {
+            let now = Self::get_now();
+            let elapsed = now - start_time;
+            let remaining = (duration - elapsed).max(0.0);
+
+            link.send_message(Msg::UpdateTime(remaining));
+
+            if remaining <= 0.0 {
+                link.send_message(Msg::StopDraw);
+            }
+        }));
+    }
+
+    /// 브라우저의 현재 시간을 밀리초 단위로 반환
+    fn get_now() -> f64 {
+        window()
+            .expect("window should be available")
+            .performance()
+            .expect("performance API should be available")
+            .now()
+    }
+
+    fn stop_timer(&mut self) {
+        self.timer = None;
+        self.countdown = None;
+    }
 }
 
 impl Component for TreeDrawingChallenge {
@@ -100,10 +136,7 @@ impl Component for TreeDrawingChallenge {
                 self.remaining_time = 5000.0;
                 self.is_drawing = true;
                 self.game_state = GameState::DrawingScreen;
-
-                let link = ctx.link().clone();
-                self.timer = Some(Timeout::new(5000, move || link.send_message(Msg::StopDraw)));
-
+                self.start_timer(ctx, 5000.0);
                 true
             }
             Msg::StartDraw(event) => {
@@ -131,7 +164,7 @@ impl Component for TreeDrawingChallenge {
             }
             Msg::StopDraw => {
                 self.is_drawing = false;
-                self.timer = None;
+                self.stop_timer(); 
                 self.game_state = GameState::ResultScreen;
                 ctx.link().send_message(Msg::CalculateScore);
                 true
@@ -141,8 +174,9 @@ impl Component for TreeDrawingChallenge {
                 self.score = Some(calculate_score(&user_points, &self.pattern));
                 true
             }
-            Msg::UpdateTime => {
-                self.remaining_time -= 50.0;
+            Msg::UpdateTime(remaining) => {
+                self.remaining_time = remaining; // 남은 시간 직접 설정
+
                 if self.remaining_time <= 0.0 {
                     ctx.link().send_message(Msg::StopDraw);
                 }
@@ -176,6 +210,7 @@ impl Component for TreeDrawingChallenge {
                         GameState::DrawingScreen => {
                             let start_draw = ctx.link().callback(|event: TouchEvent| Msg::StartDraw(event));
                             let update_draw = ctx.link().callback(|event: TouchEvent| Msg::UpdateDrawPosition(event));
+                            let stop_draw = ctx.link().callback(|_| Msg::StopDraw);
 
                             html! {
                                 <DrawingScreen 
@@ -184,6 +219,7 @@ impl Component for TreeDrawingChallenge {
                                     current_path={self.current_path.clone()}
                                     on_start_draw={start_draw}
                                     on_update_draw={update_draw}
+                                    on_touch_end={stop_draw.clone()}
                                 />
                             }
                         }
@@ -215,4 +251,8 @@ impl Component for TreeDrawingChallenge {
             </>
         }
     }
+
+
 }
+
+
