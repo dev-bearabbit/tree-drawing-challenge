@@ -46,7 +46,7 @@ impl TreeDrawingChallenge {
         self.remaining_time = duration;
 
         let link = ctx.link().clone();
-        self.countdown = Some(Interval::new(50, move || {
+        self.countdown = Some(Interval::new(100, move || {
             let now = Self::get_now();
             let elapsed = now - start_time;
             let remaining = (duration - elapsed).max(0.0);
@@ -176,8 +176,7 @@ impl Component for TreeDrawingChallenge {
                 true
             }
             Msg::CalculateScore => {
-                let user_points = self.current_path.clone();
-                self.score = Some(calculate_score(&user_points, &self.pattern));
+                self.score = Some(calculate_score(&self.current_path, &self.pattern));
                 true
             }
             Msg::UpdateTime(remaining) => {
