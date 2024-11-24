@@ -148,7 +148,7 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 }
 
 pub async fn upload_image(data_url: &str) -> Result<String, String> {
-    let api_key = "2fc4f7a32019bd384305c71135034668";
+    let api_key = "API KEY";
     let base64_image = data_url.split(',').nth(1).ok_or("Invalid data URL")?;
 
     let form_data = web_sys::FormData::new().map_err(|_| "Failed to create FormData")?;
