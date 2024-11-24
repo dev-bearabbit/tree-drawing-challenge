@@ -3,7 +3,6 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(inline_js = "
 export function loadLottieAnimationAsync() {
     setTimeout(() => {
-        console.log('Lottie animation is starting...');
         lottie.loadAnimation({
             container: document.getElementById('lottie-snow-effect'),
             renderer: 'svg',

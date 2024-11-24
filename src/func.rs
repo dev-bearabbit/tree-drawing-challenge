@@ -44,25 +44,27 @@ pub fn get_touch_position(event: &TouchEvent, svg_ref: &NodeRef) -> Option<(f64,
     }
 }
 
-pub fn calculate_score(user_path: &[(f64, f64)], pattern: &[(f64, f64)]) -> u32 {
-    let mut total_distance = 0.0;
+/// 주요 패턴 점 통과 여부 기반 점수 계산
+pub fn calculate_score(
+    user_path: &[(f64, f64)],
+    pattern: &[(f64, f64)],
+    threshold: f64,
+) -> u32 {
+    let mut passed_points = 0;
 
-    if user_path.is_empty() {
-        // 아무 것도 그리지 않았을 경우 0점 반환
-        return 0;
+    for pattern_point in pattern {
+        if user_path.iter().any(|user_point| {
+            let dx = user_point.0 - pattern_point.0;
+            let dy = user_point.1 - pattern_point.1;
+            (dx.powi(2) + dy.powi(2)).sqrt() <= threshold
+        }) {
+            passed_points += 1;
+        }
     }
 
-    for (user_point, pattern_point) in user_path.iter().zip(pattern.iter()) {
-        let dx = user_point.0 - pattern_point.0;
-        let dy = user_point.1 - pattern_point.1;
-        total_distance += (dx.powi(2) + dy.powi(2)).sqrt();
-    }
-
-    // 점수는 거리가 적을수록 높음
-    let average_distance = total_distance / user_path.len().max(1) as f64;
-    // 점수 계산 조정 (거리가 클수록 점수가 더 빠르게 줄어들도록 설정)
-    let normalized_score = 100.0 / (1.0 + average_distance / 5.0); // 거리 스케일 조정
-    let score = normalized_score.max(0.0).min(100.0).round() as u32; // 0 ~ 100 사이로 제한
+    // 점수 계산
+    let percentage = passed_points as f64 / pattern.len() as f64;
+    let score = (percentage * 100.0).round() as u32; // 0 ~ 100 사이 점수
     score
 }
 

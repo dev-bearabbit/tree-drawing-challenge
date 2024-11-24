@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use crate::upload;
 use crate::func::format_time;
 
 #[derive(Properties, PartialEq)]
@@ -17,6 +18,45 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
         .map(|(x, y)| format!("{},{}", x, y))
         .collect::<Vec<_>>()
         .join(" ");
+
+    let score = props.score;
+    let share_handler = Callback::from(move |_: MouseEvent| {
+        wasm_bindgen_futures::spawn_local(async move {
+            web_sys::console::log_1(&"Starting canvas rendering...".into());
+    
+            // 캔버스 렌더링
+            let data_url = match upload::render_canvas(score).await {
+                Ok(data_url) => {
+                    web_sys::console::log_1(&"Canvas rendered successfully.".into());
+                    data_url
+                }
+                Err(err) => {
+                    web_sys::console::error_1(&format!("Canvas error: {}", err).into());
+                    return; // 작업 중단
+                }
+            };
+    
+            web_sys::console::log_1(&"Starting image upload...".into());
+    
+            // 이미지 업로드
+            let image_url = match upload::upload_image(&data_url).await {
+                Ok(image_url) => {
+                    web_sys::console::log_1(&"Image uploaded successfully.".into());
+                    image_url
+                }
+                Err(err) => {
+                    web_sys::console::error_1(&format!("Upload error: {}", err).into());
+                    return; // 작업 중단
+                }
+            };
+    
+            web_sys::console::log_1(&"Sharing to Twitter...".into());
+    
+            // 트위터 공유
+            upload::share_to_twitter(&image_url);
+            web_sys::console::log_1(&"Twitter share initiated.".into());
+        });
+    });
 
     html! {
         <div class="screen">
@@ -45,7 +85,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
 
             <div class="tree-container">
 
-                { if props.score >= 30 {
+                { if props.score >= 70 {
                     yellow_star()
                 } else {
                     dim_star()
@@ -73,7 +113,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                 </div>                
             </div>
             <button onclick={props.on_retry.clone()} class="retry-button">{ "다시 도전하기" }</button>
-            <button class="start-button">{ "도전장 보내기" }</button>
+            <button class="start-button" onclick={share_handler}>{ "도전장 보내기" }</button>
         </div>
     }
 }

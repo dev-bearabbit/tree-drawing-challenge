@@ -83,7 +83,16 @@ impl Component for TreeDrawingChallenge {
     }
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let points = vec![(10.0, 10.0), (50.0, 50.0), (100.0, 100.0)]; // 샘플 패턴 좌표
+        let points = vec![
+            (130.0, 0.0),  // 트리 꼭대기
+            (30.0, 160.0),   // 오른쪽
+            (70.0, 160.0),  // 오른쪽
+            (00.0, 290.0),  // 밑바닥
+            (250.0, 290.0), // 밑바닥
+            (180.0, 160.0),  // 왼쪽
+            (220.0, 160.0),  // 왼쪽
+            (130.0, 0.0),  // 트리 꼭대기
+            ];
         let link = _ctx.link().clone();
         link.send_message(Msg::DetectDevice);
 
@@ -176,7 +185,7 @@ impl Component for TreeDrawingChallenge {
                 true
             }
             Msg::CalculateScore => {
-                self.score = Some(calculate_score(&self.current_path, &self.pattern));
+                self.score = Some(calculate_score(&self.current_path, &self.pattern, 20.0));
                 true
             }
             Msg::UpdateTime(remaining) => {
@@ -259,5 +268,3 @@ impl Component for TreeDrawingChallenge {
 
 
 }
-
-

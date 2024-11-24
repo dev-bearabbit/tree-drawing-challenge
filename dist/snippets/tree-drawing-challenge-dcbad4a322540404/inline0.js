@@ -1,7 +1,6 @@
 
 export function loadLottieAnimationAsync() {
     setTimeout(() => {
-        console.log('Lottie animation is starting...');
         lottie.loadAnimation({
             container: document.getElementById('lottie-snow-effect'),
             renderer: 'svg',
