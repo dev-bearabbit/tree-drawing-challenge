@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use urlencoding::encode;
 use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
@@ -148,7 +149,7 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 }
 
 pub async fn upload_image(data_url: &str) -> Result<String, String> {
-    let api_key = "API KEY";
+    let api_key = "KEY";
     let base64_image = data_url.split(',').nth(1).ok_or("Invalid data URL")?;
 
     let form_data = web_sys::FormData::new().map_err(|_| "Failed to create FormData")?;
@@ -188,15 +189,32 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
 }
 
 pub fn share_to_twitter(image_url: &str) {
+
+    let tweet_text = encode("🎄트리 그리기 챌린지🎄 친구에게 도전해 보세요");
+    let image_url_encoded = encode(image_url);
+
     let twitter_url = format!(
+        "twitter://post?message={} {}",
+        tweet_text, image_url_encoded
+    );
+
+    let fallback_url = format!(
         "https://twitter.com/intent/tweet?text={}&url={}",
-        "🎄트리 그리기 챌린지🎄 친구에게 도전해 보세요", image_url
+        tweet_text, image_url_encoded
     );
 
     if let Some(window) = web_sys::window() {
-        // `open_with_url`이 실패하면 에러 출력
-        if let Err(err) = window.open_with_url(&twitter_url) {
-            web_sys::console::error_1(&format!("Failed to open Twitter: {:?}", err).into());
+        // 트위터 앱을 먼저 시도
+        if window.open_with_url(&twitter_url).is_err() {
+            // 실패하면 웹 링크로 연결
+            if window.open_with_url(&fallback_url).is_err() {
+                window
+                    .location()
+                    .set_href(&fallback_url)
+                    .unwrap_or_else(|err| {
+                        web_sys::console::error_1(&format!("Failed to navigate: {:?}", err).into());
+                    });
+            }
         }
     } else {
         web_sys::console::error_1(&"No window object available.".into());
