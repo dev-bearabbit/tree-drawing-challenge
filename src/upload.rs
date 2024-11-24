@@ -3,7 +3,7 @@ use urlencoding::encode;
 use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement};
+use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement, window};
 
 pub async fn render_canvas(score: u32) -> Result<String, String> {
     web_sys::console::log_1(&"Initializing canvas...".into());
@@ -149,7 +149,7 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 }
 
 pub async fn upload_image(data_url: &str) -> Result<String, String> {
-    let api_key = "KEY";
+    let api_key = "2fc4f7a32019bd384305c71135034668";
     let base64_image = data_url.split(',').nth(1).ok_or("Invalid data URL")?;
 
     let form_data = web_sys::FormData::new().map_err(|_| "Failed to create FormData")?;
@@ -190,33 +190,22 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
 
 pub fn share_to_twitter(image_url: &str) {
 
+    // 트윗 텍스트와 이미지 URL 인코딩
     let tweet_text = encode("🎄트리 그리기 챌린지🎄 친구에게 도전해 보세요");
     let image_url_encoded = encode(image_url);
 
+    // 트위터 intent URL 생성
     let twitter_url = format!(
-        "twitter://post?message={} {}",
-        tweet_text, image_url_encoded
-    );
-
-    let fallback_url = format!(
         "https://twitter.com/intent/tweet?text={}&url={}",
         tweet_text, image_url_encoded
     );
 
-    if let Some(window) = web_sys::window() {
-        // 트위터 앱을 먼저 시도
-        if window.open_with_url(&twitter_url).is_err() {
-            // 실패하면 웹 링크로 연결
-            if window.open_with_url(&fallback_url).is_err() {
-                window
-                    .location()
-                    .set_href(&fallback_url)
-                    .unwrap_or_else(|err| {
-                        web_sys::console::error_1(&format!("Failed to navigate: {:?}", err).into());
-                    });
-            }
+    // 현재 페이지를 트위터 링크로 리디렉션
+    if let Some(window) = window() {
+        if let Err(err) = window.location().set_href(&twitter_url) {
+            web_sys::console::error_1(&format!("Failed to redirect: {:?}", err).into());
         }
     } else {
-        web_sys::console::error_1(&"No window object available.".into());
+        web_sys::console::error_1(&"Window object not available.".into());
     }
 }
