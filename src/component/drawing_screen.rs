@@ -1,7 +1,7 @@
-use yew::prelude::*;
 use crate::func::format_time;
 use js_sys::Date;
 use web_sys::TouchEvent;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct DrawingScreenProps {
@@ -15,7 +15,6 @@ pub struct DrawingScreenProps {
 
 #[function_component(DrawingScreen)]
 pub fn drawing_screen(props: &DrawingScreenProps) -> Html {
-
     let path_points = props
         .current_path
         .iter()
@@ -24,7 +23,7 @@ pub fn drawing_screen(props: &DrawingScreenProps) -> Html {
         .join(" ");
 
     // 현재 시간을 밀리초로 저장
-    let last_update = use_state(|| Date::now());
+    let last_update = use_state(Date::now);
     let throttle_duration = 50.0;
 
     let on_update_draw = {
@@ -60,9 +59,9 @@ pub fn drawing_screen(props: &DrawingScreenProps) -> Html {
                 </svg>
 
                 <svg class="tree-pattern"
-                     viewBox="0 0 256 291" 
-                     preserveAspectRatio="xMidYMin" 
-                     fill="none" 
+                     viewBox="0 0 256 291"
+                     preserveAspectRatio="xMidYMin"
+                     fill="none"
                      xmlns="http://www.w3.org/2000/svg"
                      ref={props.svg_ref.clone()}
                      ontouchstart={props.on_start_draw.clone()}
@@ -77,7 +76,7 @@ pub fn drawing_screen(props: &DrawingScreenProps) -> Html {
                     stroke-width="8"
                     fill="none"
                     />
-                
+
                 </svg>
 
                 <div class="timer">

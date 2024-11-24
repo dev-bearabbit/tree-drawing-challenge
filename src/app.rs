@@ -1,17 +1,17 @@
-use yew::prelude::*;
-use web_sys::{TouchEvent, window, js_sys};
-use gloo::timers::callback::{Timeout, Interval};
-use crate::func::*;
-use crate::component::start_screen::StartScreen;
 use crate::component::drawing_screen::DrawingScreen;
 use crate::component::result_screen::ResultScreen;
+use crate::component::start_screen::StartScreen;
+use crate::func::*;
 use crate::lottie::start_snow_animation;
+use gloo::timers::callback::{Interval, Timeout};
 use wasm_bindgen::JsValue;
+use web_sys::{js_sys, window, TouchEvent};
+use yew::prelude::*;
 
 pub struct TreeDrawingChallenge {
-    current_path: Vec<(f64, f64)>, // 사용자가 그린 경로
+    current_path: Vec<(f64, f64)>,     // 사용자가 그린 경로
     last_position: Option<(f64, f64)>, // 마지막 위치 저장하여 원을 연결
-    pattern: Vec<(f64, f64)>, // 트리 외곽 라인 패턴을 하나의 연속된 좌표로 저장
+    pattern: Vec<(f64, f64)>,          // 트리 외곽 라인 패턴을 하나의 연속된 좌표로 저장
     score: Option<u32>,
     timer: Option<Timeout>,
     countdown: Option<Interval>,
@@ -84,15 +84,15 @@ impl Component for TreeDrawingChallenge {
 
     fn create(_ctx: &Context<Self>) -> Self {
         let points = vec![
-            (130.0, 0.0),  // 트리 꼭대기
-            (30.0, 160.0),   // 오른쪽
+            (130.0, 0.0),   // 트리 꼭대기
+            (30.0, 160.0),  // 오른쪽
             (70.0, 160.0),  // 오른쪽
             (00.0, 290.0),  // 밑바닥
             (250.0, 290.0), // 밑바닥
-            (180.0, 160.0),  // 왼쪽
-            (220.0, 160.0),  // 왼쪽
-            (130.0, 0.0),  // 트리 꼭대기
-            ];
+            (180.0, 160.0), // 왼쪽
+            (220.0, 160.0), // 왼쪽
+            (130.0, 0.0),   // 트리 꼭대기
+        ];
         let link = _ctx.link().clone();
         link.send_message(Msg::DetectDevice);
 
@@ -118,12 +118,13 @@ impl Component for TreeDrawingChallenge {
                     let navigator = window.navigator();
                     let user_agent = navigator.user_agent().unwrap_or_default();
                     web_sys::console::log_1(&format!("User-Agent: {}", user_agent).into());
-            
+
                     // 터치 디바이스 확인
-                    let has_touch_event = js_sys::Reflect::has(&window, &JsValue::from_str("ontouchstart"))
-                        .unwrap_or(false);
+                    let has_touch_event =
+                        js_sys::Reflect::has(&window, &JsValue::from_str("ontouchstart"))
+                            .unwrap_or(false);
                     let is_touch_device = has_touch_event || navigator.max_touch_points() > 0;
-            
+
                     // 플랫폼 확인
                     let platform = navigator.platform().unwrap_or_default();
                     let is_ipad = platform.contains("iPad") // iPad 플랫폼 명시적 감지
@@ -134,16 +135,16 @@ impl Component for TreeDrawingChallenge {
                         || user_agent.contains("Android")
                         || user_agent.contains("Mobile")
                         || is_ipad;
-            
+
                     self.is_mobile = Some(is_mobile && is_touch_device);
-            
+
                     // 모바일이 아니면 UnsupportedDevice 상태로 변경
                     if !self.is_mobile.unwrap_or(false) {
                         self.game_state = GameState::UnsupportedDevice;
                     }
                 }
                 true
-            } 
+            }
             Msg::StartGame => {
                 self.current_path.clear();
                 self.last_position = None;
@@ -167,7 +168,8 @@ impl Component for TreeDrawingChallenge {
                 if self.is_drawing {
                     if let Some((x, y)) = get_touch_position(&event, &self.svg_ref) {
                         if let Some(last_pos) = self.last_position {
-                            let distance = ((x - last_pos.0).powi(2) + (y - last_pos.1).powi(2)).sqrt();
+                            let distance =
+                                ((x - last_pos.0).powi(2) + (y - last_pos.1).powi(2)).sqrt();
                             if distance > 2.0 && distance < 100.0 {
                                 self.current_path.push((x, y));
                                 self.last_position = Some((x, y));
@@ -179,7 +181,7 @@ impl Component for TreeDrawingChallenge {
             }
             Msg::StopDraw => {
                 self.is_drawing = false;
-                self.stop_timer(); 
+                self.stop_timer();
                 self.game_state = GameState::ResultScreen;
                 ctx.link().send_message(Msg::CalculateScore);
                 true
@@ -227,7 +229,7 @@ impl Component for TreeDrawingChallenge {
                             let stop_draw = ctx.link().callback(|_| Msg::StopDraw);
 
                             html! {
-                                <DrawingScreen 
+                                <DrawingScreen
                                     remaining_time={self.remaining_time}
                                     svg_ref={self.svg_ref.clone()}
                                     current_path={self.current_path.clone()}
@@ -241,10 +243,10 @@ impl Component for TreeDrawingChallenge {
                             let retry = ctx.link().callback(|_| Msg::StartGame);
 
                             html! {
-                                <ResultScreen 
-                                    score={self.score.unwrap_or(0)} 
-                                    current_path={self.current_path.clone()} 
-                                    on_retry={retry} 
+                                <ResultScreen
+                                    score={self.score.unwrap_or(0)}
+                                    current_path={self.current_path.clone()}
+                                    on_retry={retry}
                                     remaining_time={self.remaining_time}
                                 />
                             }
@@ -265,6 +267,4 @@ impl Component for TreeDrawingChallenge {
             </>
         }
     }
-
-
 }

@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlCanvasElement, CanvasRenderingContext2d, HtmlImageElement};
+use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement};
 
 pub async fn render_canvas(score: u32) -> Result<String, String> {
     web_sys::console::log_1(&"Initializing canvas...".into());
@@ -40,7 +40,9 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 
     // onerror 이벤트 추가
     let error_closure = Closure::wrap(Box::new(|| {
-        web_sys::console::error_1(&"Failed to load image. Please check the path or network.".into());
+        web_sys::console::error_1(
+            &"Failed to load image. Please check the path or network.".into(),
+        );
     }) as Box<dyn Fn()>);
     img.set_onerror(Some(error_closure.as_ref().unchecked_ref()));
     error_closure.forget();
@@ -56,7 +58,8 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
         web_sys::console::log_1(&"Image loaded.".into());
 
         if let Some(sender) = sender_clone.borrow_mut().take() {
-            if let Err(err) = context_clone.draw_image_with_html_image_element(&img_clone, 0.0, 0.0) {
+            if let Err(err) = context_clone.draw_image_with_html_image_element(&img_clone, 0.0, 0.0)
+            {
                 web_sys::console::error_1(&format!("Failed to draw image: {:?}", err).into());
                 sender
                     .send(Err(format!("Failed to draw image: {:?}", err)))
@@ -71,8 +74,10 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
             // 점수 (다른 색상 적용)
             context_clone.set_fill_style_str("#72F48F"); // 점수 색상
             context_clone.set_font("bold 60px Pretendard"); // 점수 폰트
-            if let Err(err) = context_clone.fill_text(&format!("{}", score), 350.0, 380.0) {
-                web_sys::console::error_1(&format!("Failed to render score text: {:?}", err).into());
+            if let Err(err) = context_clone.fill_text(&format!("{}", score), 375.0, 380.0) {
+                web_sys::console::error_1(
+                    &format!("Failed to render score text: {:?}", err).into(),
+                );
                 sender
                     .send(Err(format!("Failed to render score text: {:?}", err)))
                     .unwrap();
@@ -81,11 +86,13 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 
             context_clone.set_text_align("left"); // 텍스트 정렬: 왼쪽
             context_clone.set_text_baseline("middle"); // 텍스트 기준선: 중간
-            // 큰 글씨
+                                                       // 큰 글씨
             context_clone.set_fill_style_str("#FFFFFF"); // 큰 글씨 색상
             context_clone.set_font("bold 60px Pretendard"); // 큰 글씨 폰트
             if let Err(err) = context_clone.fill_text("내 트리는", 50.0, 380.0) {
-                web_sys::console::error_1(&format!("Failed to render large text: {:?}", err).into());
+                web_sys::console::error_1(
+                    &format!("Failed to render large text: {:?}", err).into(),
+                );
                 sender
                     .send(Err(format!("Failed to render large text: {:?}", err)))
                     .unwrap();
@@ -95,8 +102,10 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
             // 큰 글씨
             context_clone.set_fill_style_str("#FFFFFF"); // 큰 글씨 색상
             context_clone.set_font("bold 60px Pretendard"); // 큰 글씨 폰트
-            if let Err(err) = context_clone.fill_text("점", 360.0, 380.0) {
-                web_sys::console::error_1(&format!("Failed to render large text: {:?}", err).into());
+            if let Err(err) = context_clone.fill_text("점", 380.0, 380.0) {
+                web_sys::console::error_1(
+                    &format!("Failed to render large text: {:?}", err).into(),
+                );
                 sender
                     .send(Err(format!("Failed to render large text: {:?}", err)))
                     .unwrap();
@@ -106,8 +115,11 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
             // 작은 글씨
             context_clone.set_fill_style_str("#FFFFFF"); // 작은 글씨 색상
             context_clone.set_font("bold 35px Pretendard"); // 작은 글씨 폰트
-            if let Err(err) = context_clone.fill_text("어디 한번 덤벼 보시지", 50.0, 450.0) {
-                web_sys::console::error_1(&format!("Failed to render small text: {:?}", err).into());
+            if let Err(err) = context_clone.fill_text("어디 한번 덤벼 보시지", 50.0, 450.0)
+            {
+                web_sys::console::error_1(
+                    &format!("Failed to render small text: {:?}", err).into(),
+                );
                 sender
                     .send(Err(format!("Failed to render small text: {:?}", err)))
                     .unwrap();
@@ -123,7 +135,9 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
     closure.forget();
 
     // 이미지 로드 완료 대기
-    receiver.await.map_err(|_| "Image loading failed".to_string())??;
+    receiver
+        .await
+        .map_err(|_| "Image loading failed".to_string())??;
 
     web_sys::console::log_1(&"Canvas rendering complete.".into());
 
@@ -133,9 +147,8 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
         .map_err(|_| "Failed to convert canvas to data URL".to_string())
 }
 
-
 pub async fn upload_image(data_url: &str) -> Result<String, String> {
-    let api_key = "IMGBB API KEY";
+    let api_key = "2fc4f7a32019bd384305c71135034668";
     let base64_image = data_url.split(',').nth(1).ok_or("Invalid data URL")?;
 
     let form_data = web_sys::FormData::new().map_err(|_| "Failed to create FormData")?;
@@ -150,8 +163,7 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
     let ans = web_sys::RequestInit::new();
     ans.set_method("POST");
     ans.set_body(&form_data);
-    let fetch = window.fetch_with_str_and_init(
-        "https://api.imgbb.com/1/upload", &ans);
+    let fetch = window.fetch_with_str_and_init("https://api.imgbb.com/1/upload", &ans);
 
     let response = wasm_bindgen_futures::JsFuture::from(fetch)
         .await
@@ -171,14 +183,14 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
         .and_then(|data| js_sys::Reflect::get(&data, &"url".into()))
         .map_err(|_| "Failed to extract URL from ImgBB response")?;
 
-    url.as_string().ok_or("Failed to convert URL to String".to_string())
+    url.as_string()
+        .ok_or("Failed to convert URL to String".to_string())
 }
 
 pub fn share_to_twitter(image_url: &str) {
     let twitter_url = format!(
         "https://twitter.com/intent/tweet?text={}&url={}",
-        "🎄트리 그리기 챌린지🎄 친구에게 도전해 보세요",
-        image_url
+        "🎄트리 그리기 챌린지🎄 친구에게 도전해 보세요", image_url
     );
 
     if let Some(window) = web_sys::window() {

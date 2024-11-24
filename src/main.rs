@@ -1,7 +1,6 @@
-
-mod func;
 mod app;
 mod component;
+mod func;
 mod lottie;
 mod upload;
 

@@ -1,6 +1,5 @@
-use web_sys::{TouchEvent, SvgsvgElement};
+use web_sys::{SvgsvgElement, TouchEvent};
 use yew::NodeRef;
-
 
 /// 터치 이벤트로부터 SVG 내부 좌표 계산
 pub fn get_touch_position(event: &TouchEvent, svg_ref: &NodeRef) -> Option<(f64, f64)> {
@@ -12,8 +11,8 @@ pub fn get_touch_position(event: &TouchEvent, svg_ref: &NodeRef) -> Option<(f64,
             let rect = svg.get_bounding_client_rect();
 
             // SVG의 크기와 ViewBox 크기 가져오기
-            let svg_width = rect.width() as f64;
-            let svg_height = rect.height() as f64;
+            let svg_width = rect.width();
+            let svg_height = rect.height();
 
             let view_box = svg
                 .get_attribute("viewBox")
@@ -29,8 +28,9 @@ pub fn get_touch_position(event: &TouchEvent, svg_ref: &NodeRef) -> Option<(f64,
                 let view_box_height = view_box[3];
 
                 // 터치 좌표를 SVG 내부 좌표로 변환
-                let x = ((client_x - rect.left() as f64) / svg_width) * view_box_width + view_box_x;
-                let y = ((client_y - rect.top() as f64) / svg_height) * view_box_height + view_box_y;
+                let x = ((client_x - rect.left()) / svg_width) * view_box_width + view_box_x;
+                let y =
+                    ((client_y - rect.top()) / svg_height) * view_box_height + view_box_y;
 
                 Some((x, y))
             } else {
@@ -45,11 +45,7 @@ pub fn get_touch_position(event: &TouchEvent, svg_ref: &NodeRef) -> Option<(f64,
 }
 
 /// 주요 패턴 점 통과 여부 기반 점수 계산
-pub fn calculate_score(
-    user_path: &[(f64, f64)],
-    pattern: &[(f64, f64)],
-    threshold: f64,
-) -> u32 {
+pub fn calculate_score(user_path: &[(f64, f64)], pattern: &[(f64, f64)], threshold: f64) -> u32 {
     let mut passed_points = 0;
 
     for pattern_point in pattern {
@@ -64,8 +60,7 @@ pub fn calculate_score(
 
     // 점수 계산
     let percentage = passed_points as f64 / pattern.len() as f64;
-    let score = (percentage * 100.0).round() as u32; // 0 ~ 100 사이 점수
-    score
+    (percentage * 100.0).round() as u32 // 0 ~ 100 사이 점수
 }
 
 pub fn format_time(milliseconds: f64) -> String {

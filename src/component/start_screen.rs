@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct StartScreenProps {
-    pub on_start: Callback<MouseEvent>
+    pub on_start: Callback<MouseEvent>,
 }
 
 #[function_component(StartScreen)]
