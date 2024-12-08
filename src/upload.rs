@@ -148,8 +148,9 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
         .map_err(|_| "Failed to convert canvas to data URL".to_string())
 }
 
+
 pub async fn upload_image(data_url: &str) -> Result<String, String> {
-    let api_key = "KEY";
+    let api_key = "2fc4f7a32019bd384305c71135034668";
     let base64_image = data_url.split(',').nth(1).ok_or("Invalid data URL")?;
 
     let form_data = web_sys::FormData::new().map_err(|_| "Failed to create FormData")?;
@@ -181,12 +182,13 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
         .map_err(|_| "Failed to parse ImgBB response")?;
 
     let url = js_sys::Reflect::get(&json, &"data".into())
-        .and_then(|data| js_sys::Reflect::get(&data, &"url".into()))
+        .and_then(|data| js_sys::Reflect::get(&data, &"url_viewer".into()))
         .map_err(|_| "Failed to extract URL from ImgBB response")?;
 
     url.as_string()
         .ok_or("Failed to convert URL to String".to_string())
 }
+
 
 pub fn share_to_twitter(image_url: &str) {
 
@@ -196,13 +198,34 @@ pub fn share_to_twitter(image_url: &str) {
 
     // 트위터 intent URL 생성
     let twitter_url = format!(
-        "https://twitter.com/intent/tweet?text={}&url={}",
-        tweet_text, image_url_encoded
+        "https://twitter.com/intent/tweet?original_referer={}&url={}&text={}",
+       image_url_encoded, image_url_encoded, tweet_text
     );
 
     // 현재 페이지를 트위터 링크로 리디렉션
     if let Some(window) = window() {
         if let Err(err) = window.location().set_href(&twitter_url) {
+            web_sys::console::error_1(&format!("Failed to redirect: {:?}", err).into());
+        }
+    } else {
+        web_sys::console::error_1(&"Window object not available.".into());
+    }
+}
+
+pub fn share_to_facebook(image_url: &str) {
+
+    // URL 인코딩
+    let image_url_encoded = encode(image_url);
+
+    // facebook intent URL 생성
+    let facebook_url = format!(
+        "https://www.facebook.com/share.php?u={}",
+       image_url_encoded
+    );
+
+    // 현재 페이지를 트위터 링크로 리디렉션
+    if let Some(window) = window() {
+        if let Err(err) = window.location().set_href(&facebook_url) {
             web_sys::console::error_1(&format!("Failed to redirect: {:?}", err).into());
         }
     } else {

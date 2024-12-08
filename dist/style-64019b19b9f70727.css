@@ -1,0 +1,242 @@
+/* 전체 화면의 배경 설정 */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, #234770 0%, #07101B 100%);
+    color: #fff;
+    font-family: Pretendard;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    overflow: hidden;
+}
+
+/* 컨테이너 중앙 정렬 */
+.screen {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2vh; /* 요소 간의 간격을 뷰포트 높이에 비례 */
+    text-align: center;
+}
+
+.screen-page {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2vh; /* 요소 간의 간격을 뷰포트 높이에 비례 */
+    text-align: center;
+}
+
+.tree-container {
+    display: flex;
+    flex-direction: column; /* 세로 방향 정렬 */
+    justify-content: center; /* 자식 요소 중앙 정렬 */
+    align-items: center;
+    width: 100%;
+    height: auto; /* 높이는 내용에 따라 */
+    max-height: 60vh;
+    gap: 1vh; /* star와 tree-pattern 간격 */
+    pointer-events: auto;
+    margin-top: 5vh;
+    margin-bottom: 0vh;
+}
+
+/* 반응형 SVG 스타일 */
+.tree-container svg {
+    width: 20vw; /* 디바이스 너비의 20% */
+    max-width: 100px; /* 최대 크기 제한 */
+    height: auto;
+}
+
+/* star의 추가 스타일 */
+.tree-container .star {
+    width: 13vw; /* 뷰포트 너비에 따라 동적 조정 */
+    max-width: 100px; /* 최대 크기 제한 */
+    max-height: 100px; /* 최대 크기 제한 */
+}
+
+.tree-container .star-yellow {
+    width: 13vw; /* 뷰포트 너비에 따라 동적 조정 */
+    max-width: 100px; /* 최대 크기 제한 */
+    max-height: 100px; /* 최대 크기 제한 */
+    filter: drop-shadow(0 0 10px #FFF983) drop-shadow(0 0 20px #FFF983);
+}
+
+/* tree-pattern의 추가 스타일 */
+.tree-container .tree-pattern {
+    width: 65vw; /* 뷰포트 너비의 80% */
+    max-width: 400px; /* 최대 크기 제한 */
+    height: auto;
+    pointer-events: auto;
+    overflow: visible;
+    position: relative;
+}
+
+/* timer 위치 */
+.tree-container .timer {
+    position: absolute;
+    top: 65vh; /* 상단으로부터 50% */
+    left: 50%; /* 왼쪽으로부터 50% */
+    transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
+    font-size: calc(2vw + 1.5rem);; /* 적절한 크기 설정 */
+    color: white;
+    text-align: center;
+    font-family: Pretendard;
+}
+
+.sentence {
+    position: absolute; /* 위치를 고정 */
+    top: 5vh;
+    left: 0;
+    right: 0;
+    text-align: center; /* 중앙 정렬 */
+    justify-content: center;
+    align-items: center;
+}
+
+.sentence h1 {
+    font-size: calc(3vw + 1.5rem);
+    margin-bottom: calc(0.8vh);
+    color: #ffffff;
+}
+
+.highlight {
+    color: #72F48F; /* 트리 글자색 (녹색) */
+    font-weight: bold; /* 강조 효과 */
+}
+
+.sentence p {
+    font-size: calc(2vw + 0.5rem);
+    color: #FFFFFF99;
+}
+
+.sentence h3 {
+    font-size: calc(2vw + 0.7rem);
+    color: white;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.result-sentence {
+    position: absolute; /* 위치를 고정 */
+    top: 5vh;
+    left: 0;
+    right: 0;
+    text-align: center; /* 중앙 정렬 */
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.result-sentence h3 {
+    font-size: calc(2vw + 0.7rem);
+    color: white;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.score {
+    position: relative;
+    z-index: 2; /* 다른 요소 위에 표시 */
+    margin-top: -30px;
+}
+
+.score .score-background {
+    position: absolute; /* 배경 SVG 위치 */
+    top: 50%; /* 부모의 중앙 */
+    left: 50%; /* 부모의 중앙 */
+    transform: translate(-50%, -45%); /* 정확한 중앙 정렬 */
+    width: 125px; /* SVG 크기 */
+    height: 70px; /* SVG 높이 */
+}
+
+.score .score-text {
+    position: absolute; /* 텍스트를 배경 SVG 위에 배치 */
+    top: 50%; /* 부모의 중앙 */
+    left: 50%; /* 부모의 중앙 */
+    transform: translate(-50%, -55%); /* 정확한 중앙 정렬 */
+    font-size: 2rem; /* 텍스트 크기 */
+    font-weight: bold; /* 텍스트 굵게 */
+    color: black; /* 텍스트 색상 */
+    text-align: center; /* 텍스트 정렬 */
+    white-space: nowrap;
+}
+
+.start-button {
+    position: fixed;
+    border-radius: 8px;
+    padding: 16px 24px;
+    font-size: 1rem;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    background-color: #72F48F; /* 녹색 버튼 */
+    color: #000;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+
+.start-button:hover {
+    background-color: #72F48F;
+}
+
+.retry-button {        
+    position: fixed;
+    border-radius: 8px;
+    padding: 16px 24px;
+    font-size: 1rem;
+    bottom: 72px;
+    left: 16px;
+    right: 16px;
+    background-color: #FFFFFF4D; /* 녹색 버튼 */
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+
+.retry-button {
+    background-color: #FFFFFF4D;
+}
+
+/* 디바이스 알림 */
+.unsupported-device {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    text-align: center;
+    background-color: #234770;
+    color: white;
+    font-family: Pretendard, sans-serif;
+    font-size: 1.5rem;
+}
+
+.alert-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #f04d4d;
+    margin-bottom: 1rem;
+}
+
+.unsupported-device p {
+    margin: 0.5rem 0;
+}
