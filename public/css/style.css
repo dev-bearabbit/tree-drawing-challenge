@@ -1,9 +1,13 @@
 /* 전체 화면의 배경 설정 */
+:root {
+    --vh: 1vh;
+}
+
 body, html {
     position: fixed;
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: calc(var(--vh) * 100);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,7 +22,7 @@ body, html {
 
 /* 컨테이너 중앙 정렬 */
 .screen {
-    height: 100vh;
+    height: calc(var(--vh) * 100);
     width: 100vw;
     display: flex;
     flex-direction: column;
