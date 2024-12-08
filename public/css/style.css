@@ -90,6 +90,7 @@ body, html {
 .tree-container .timer {
     position: fixed;
     bottom: 30vh;
+    bottom: calc(-webkit-fill-available * 0.30);
     font-size: calc(2vw + 1.5rem);; /* 적절한 크기 설정 */
     color: white;
     text-align: center;
@@ -100,6 +101,7 @@ body, html {
     position: fixed;
     font-size: 0.9rem;
     bottom: 36vh;
+    bottom: calc(-webkit-fill-available * 0.36);
     color: #72F48F;
     background-color: transparent;
     cursor: pointer;
