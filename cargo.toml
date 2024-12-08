@@ -31,4 +31,6 @@ features = ["console",
             "HtmlCanvasElement",
             "ImageBitmap",
             "HtmlImageElement",
+            "HtmlAnchorElement",
+            "ShareData"
             ]

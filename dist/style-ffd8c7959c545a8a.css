@@ -86,13 +86,28 @@ body, html {
 /* timer 위치 */
 .tree-container .timer {
     position: absolute;
-    top: 65vh; /* 상단으로부터 50% */
+    top: 70vh; /* 상단으로부터 50% */
     left: 50%; /* 왼쪽으로부터 50% */
     transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
     font-size: calc(2vw + 1.5rem);; /* 적절한 크기 설정 */
     color: white;
     text-align: center;
     font-family: Pretendard;
+}
+
+.tree-container .retry-button {        
+    position: absolute;
+    top: 64vh; /* 상단으로부터 50% */
+    font-size: 0.9rem;
+    color: #72F48F;
+    background-color: transparent;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: none; /* 테두리 제거 */
+    outline: none; /* 포커스 시 테두리 제거 */
+    line-height: 1; /* 줄 간격 조정 */
 }
 
 .sentence {
@@ -149,12 +164,11 @@ body, html {
 .score {
     position: relative;
     z-index: 2; /* 다른 요소 위에 표시 */
-    margin-top: -30px;
 }
 
 .score .score-background {
     position: absolute; /* 배경 SVG 위치 */
-    top: 50%; /* 부모의 중앙 */
+    top: 40%; /* 부모의 중앙 */
     left: 50%; /* 부모의 중앙 */
     transform: translate(-50%, -45%); /* 정확한 중앙 정렬 */
     width: 125px; /* SVG 크기 */
@@ -194,27 +208,6 @@ body, html {
     background-color: #72F48F;
 }
 
-.retry-button {        
-    position: fixed;
-    border-radius: 8px;
-    padding: 16px 24px;
-    font-size: 1rem;
-    bottom: 72px;
-    left: 16px;
-    right: 16px;
-    background-color: #FFFFFF4D; /* 녹색 버튼 */
-    color: white;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    justify-content: center;
-    align-items: center;
-}
-
-.retry-button {
-    background-color: #FFFFFF4D;
-}
-
 /* 디바이스 알림 */
 .unsupported-device {
     display: flex;
@@ -239,4 +232,54 @@ body, html {
 
 .unsupported-device p {
     margin: 0.5rem 0;
+}
+
+/* 공유하기 */
+.share-section {
+    position: fixed;
+    bottom: -100%; /* 화면 아래로 숨김 */
+    left: 0;
+    width: 100%;
+    height: 150px;
+    background-color: #ffffff;
+    box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: bottom 0.4s ease; /* 애니메이션 */
+}
+
+.share-section.show {
+    bottom: 0; /* 화면 위로 표시 */
+}
+
+
+.share-container .share-text {
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.icons {
+    display: flex;
+    justify-content: space-around;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.icon-button {
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.icon-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }

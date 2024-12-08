@@ -12,6 +12,10 @@ pub struct ResultScreenProps {
 
 #[function_component(ResultScreen)]
 pub fn result_screen(props: &ResultScreenProps) -> Html {
+    // 상태 정의
+    let is_share_section_visible = use_state(|| false); // 공유 섹션 표시 상태
+    let image_url = use_state(|| None::<String>); // 업로드된 이미지 URL 상태
+
     let path_points = props
         .current_path
         .iter()
@@ -19,45 +23,80 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
         .collect::<Vec<_>>()
         .join(" ");
 
-    let score = props.score;
-    let share_handler = Callback::from(move |_: MouseEvent| {
-        wasm_bindgen_futures::spawn_local(async move {
-            web_sys::console::log_1(&"Starting canvas rendering...".into());
+    // 공유 버튼 핸들러
+    let share_handler = {
+        let is_share_section_visible = is_share_section_visible.clone();
+        let image_url = image_url.clone();
+        let score = props.score;
 
-            // 캔버스 렌더링
-            let data_url = match upload::render_canvas(score).await {
-                Ok(data_url) => {
-                    web_sys::console::log_1(&"Canvas rendered successfully.".into());
-                    data_url
+        Callback::from(move |_: MouseEvent| {
+            wasm_bindgen_futures::spawn_local({
+                let is_share_section_visible = is_share_section_visible.clone();
+                let image_url = image_url.clone();
+
+                async move {
+                    web_sys::console::log_1(&"Starting canvas rendering...".into());
+
+                    // 캔버스 렌더링
+                    let data_url = match upload::render_canvas(score).await {
+                        Ok(data_url) => {
+                            web_sys::console::log_1(&"Canvas rendered successfully.".into());
+                            data_url
+                        }
+                        Err(err) => {
+                            web_sys::console::error_1(&format!("Canvas error: {}", err).into());
+                            return; // 작업 중단
+                        }
+                    };
+
+                    web_sys::console::log_1(&"Starting image upload...".into());
+
+                    // 이미지 업로드
+                    let uploaded_image_url = match upload::upload_image(&data_url).await {
+                        Ok(image_url) => {
+                            web_sys::console::log_1(&"Image uploaded successfully.".into());
+                            image_url
+                        }
+                        Err(err) => {
+                            web_sys::console::error_1(&format!("Upload error: {}", err).into());
+                            return; // 작업 중단
+                        }
+                    };
+
+                    // 상태 업데이트
+                    is_share_section_visible.set(true);
+                    image_url.set(Some(uploaded_image_url));
                 }
-                Err(err) => {
-                    web_sys::console::error_1(&format!("Canvas error: {}", err).into());
-                    return; // 작업 중단
+            });
+        })
+    };
+
+    let share_to_platform = {
+        let image_url = image_url.clone(); // 상태 복사
+        Callback::from(move |platform: String| {
+            if let Some(url) = &*image_url {
+                match platform.as_str() {
+                    "facebook" => {
+                        upload::share_to_facebook(url);
+                    }
+                    "twitter" => {
+                        upload::share_to_twitter(url);
+                    }
+                    "web" => {
+                        upload::share_to_web(url);
+                    }
+                    "download" => {
+                        upload::share_to_download(url);
+                    }
+                    _ => {}
                 }
-            };
-
-            web_sys::console::log_1(&"Starting image upload...".into());
-
-            // 이미지 업로드
-            let image_url = match upload::upload_image(&data_url).await {
-                Ok(image_url) => {
-                    web_sys::console::log_1(&"Image uploaded successfully.".into());
-                    image_url
-                }
-                Err(err) => {
-                    web_sys::console::error_1(&format!("Upload error: {}", err).into());
-                    return; // 작업 중단
-                }
-            };
-
-            web_sys::console::log_1(&"Sharing to Twitter...".into());
-
-            // 트위터 공유
-            upload::share_to_twitter(&image_url);
-            web_sys::console::log_1(&"Twitter share initiated.".into());
-        });
-    });
-
+            } else {
+                web_sys::console::error_1(&"Image URL not available.".into());
+            }
+        })
+    };
+    
+    
     html! {
         <div class="screen">
             <div class="result-sentence">
@@ -108,12 +147,25 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
 
                 </svg>
 
+                <button onclick={props.on_retry.clone()} class="retry-button">{ "↻ 다시 도전하기" }</button>
+
                 <div class="timer">
                     { format_time(props.remaining_time) }
                 </div>
             </div>
-            <button onclick={props.on_retry.clone()} class="retry-button">{ "다시 도전하기" }</button>
             <button class="start-button" onclick={share_handler}>{ "도전장 보내기" }</button>
+
+            <div id="share-section" class={if *is_share_section_visible { "share-section show" } else { "share-section hidden" }}>
+                <div class="share-container">
+                    <div class="share-text">{ "🌲 친구에게 도전장 보내기 🌲" }</div>
+                    <div class="icons">
+                        <button class="icon-button" onclick={share_to_platform.reform(|_| "facebook".to_string())}><img src="image/facebook-icon.png" alt="Facebook"/></button>
+                        <button class="icon-button" onclick={share_to_platform.reform(|_| "twitter".to_string())}><img src="image/x-icon.png" alt="Twitter" /></button>
+                        <button class="icon-button" onclick={share_to_platform.reform(|_| "web".to_string())}><img src="image/link-icon.png" alt="Copy" /></button>
+                        <button class="icon-button" onclick={share_to_platform.reform(|_| "download".to_string())}><img src="image/download-icon.png" alt="Download" /></button>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 }
