@@ -6,7 +6,7 @@ export function loadLottieAnimationAsync() {
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: '/tree-drawing-challenge/lottie/snow-effect.json',
+            path: '/lottie/snow-effect.json',
             rendererSettings: {
                 preserveAspectRatio: 'xMidYMid slice' // 전체 화면에 맞도록 크기 조정
             }
