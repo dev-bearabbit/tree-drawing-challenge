@@ -35,7 +35,7 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 
     // 이미지 로드
     let img = HtmlImageElement::new().map_err(|_| "Failed to create HtmlImageElement")?;
-    img.set_src("/tree-drawing-challenge/image/background.jpg");
+    img.set_src("/image/background.jpg");
 
     web_sys::console::log_1(&"Image element created. Waiting for onload...".into());
 
