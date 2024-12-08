@@ -1,5 +1,6 @@
 /* 전체 화면의 배경 설정 */
 body, html {
+    position: fixed;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -8,7 +9,7 @@ body, html {
     align-items: center;
     background: linear-gradient(180deg, #234770 0%, #07101B 100%);
     color: #fff;
-    font-family: Pretendard;
+    font-family: Pretendard, Arial, sans-serif;
     text-align: left;
     text-underline-position: from-font;
     text-decoration-skip-ink: none;
@@ -39,6 +40,7 @@ body, html {
 }
 
 .tree-container {
+    position: fixed;
     display: flex;
     flex-direction: column; /* 세로 방향 정렬 */
     justify-content: center; /* 자식 요소 중앙 정렬 */
@@ -85,7 +87,7 @@ body, html {
 
 /* timer 위치 */
 .tree-container .timer {
-    position: absolute;
+    position: fixed;
     top: 70vh; /* 상단으로부터 50% */
     left: 50%; /* 왼쪽으로부터 50% */
     transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
@@ -96,7 +98,7 @@ body, html {
 }
 
 .tree-container .retry-button {        
-    position: absolute;
+    position: fixed;
     top: 64vh; /* 상단으로부터 50% */
     font-size: 0.9rem;
     color: #72F48F;
@@ -111,7 +113,7 @@ body, html {
 }
 
 .sentence {
-    position: absolute; /* 위치를 고정 */
+    position: fixed; /* 위치를 고정 */
     top: 5vh;
     left: 0;
     right: 0;
@@ -144,7 +146,7 @@ body, html {
 }
 
 .result-sentence {
-    position: absolute; /* 위치를 고정 */
+    position: fixed; /* 위치를 고정 */
     top: 5vh;
     left: 0;
     right: 0;
@@ -162,13 +164,13 @@ body, html {
 }
 
 .score {
-    position: relative;
+    position: fixed;
     z-index: 2; /* 다른 요소 위에 표시 */
 }
 
 .score .score-background {
-    position: absolute; /* 배경 SVG 위치 */
-    top: 40%; /* 부모의 중앙 */
+    position: fixed; /* 배경 SVG 위치 */
+    top: 20%; /* 부모의 중앙 */
     left: 50%; /* 부모의 중앙 */
     transform: translate(-50%, -45%); /* 정확한 중앙 정렬 */
     width: 125px; /* SVG 크기 */
@@ -176,8 +178,8 @@ body, html {
 }
 
 .score .score-text {
-    position: absolute; /* 텍스트를 배경 SVG 위에 배치 */
-    top: 50%; /* 부모의 중앙 */
+    position: fixed; /* 텍스트를 배경 SVG 위에 배치 */
+    top: 20%; /* 부모의 중앙 */
     left: 50%; /* 부모의 중앙 */
     transform: translate(-50%, -55%); /* 정확한 중앙 정렬 */
     font-size: 2rem; /* 텍스트 크기 */
