@@ -89,7 +89,7 @@ body, html {
 /* timer 위치 */
 .tree-container .timer {
     position: fixed;
-    top: 70vh; /* 상단으로부터 50% */
+    top: 70%; /* 상단으로부터 50% */
     left: 50%; /* 왼쪽으로부터 50% */
     transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
     font-size: calc(2vw + 1.5rem);; /* 적절한 크기 설정 */
@@ -100,7 +100,7 @@ body, html {
 
 .tree-container .retry-button {        
     position: fixed;
-    top: 64vh; /* 상단으로부터 50% */
+    top: 65%; /* 상단으로부터 50% */
     font-size: 0.9rem;
     color: #72F48F;
     background-color: transparent;
@@ -108,6 +108,7 @@ body, html {
     justify-content: center;
     align-items: center;
     display: flex;
+    font-weight: bold;
     border: none; /* 테두리 제거 */
     outline: none; /* 포커스 시 테두리 제거 */
     line-height: 1; /* 줄 간격 조정 */
