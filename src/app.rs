@@ -5,11 +5,10 @@ use crate::func::*;
 use crate::lottie::start_snow_animation;
 use gloo::timers::callback::{Interval, Timeout};
 use wasm_bindgen::JsValue;
-use web_sys::{js_sys, window, TouchEvent};
+use web_sys::{js_sys, window};
 use yew::prelude::*;
 
 pub struct TreeDrawingChallenge {
-    current_path: Vec<(f64, f64)>,     // 사용자가 그린 경로
     last_position: Option<(f64, f64)>, // 마지막 위치 저장하여 원을 연결
     pattern: Vec<(f64, f64)>,          // 트리 외곽 라인 패턴을 하나의 연속된 좌표로 저장
     score: Option<u32>,
@@ -20,6 +19,7 @@ pub struct TreeDrawingChallenge {
     is_drawing: bool,
     game_state: GameState, // 화면 상태 추가
     is_mobile: Option<bool>,
+    result_path: Vec<(f64, f64)>,     // 사용자가 그린 경로
 }
 pub enum GameState {
     StartScreen,
@@ -30,12 +30,12 @@ pub enum GameState {
 
 pub enum Msg {
     StartGame,
-    StartDraw(TouchEvent),
-    UpdateDrawPosition(TouchEvent),
+    StartDraw,
     StopDraw,
     CalculateScore,
     UpdateTime(f64),
     DetectDevice,
+    SetResultPath(Vec<(f64, f64)>),
 }
 
 impl TreeDrawingChallenge {
@@ -149,7 +149,6 @@ impl Component for TreeDrawingChallenge {
         link.send_message(Msg::DetectDevice);
 
         Self {
-            current_path: vec![],
             last_position: None,
             pattern: points,
             score: None,
@@ -160,6 +159,7 @@ impl Component for TreeDrawingChallenge {
             is_drawing: false,
             game_state: GameState::StartScreen,
             is_mobile: None,
+            result_path: vec![],
         }
     }
 
@@ -198,7 +198,7 @@ impl Component for TreeDrawingChallenge {
                 true
             }
             Msg::StartGame => {
-                self.current_path.clear();
+                self.result_path.clear();
                 self.last_position = None;
                 self.score = None;
                 self.remaining_time = 5000.0;
@@ -207,28 +207,7 @@ impl Component for TreeDrawingChallenge {
                 self.start_timer(ctx, 5000.0);
                 true
             }
-            Msg::StartDraw(event) => {
-                if self.is_drawing {
-                    if let Some((x, y)) = get_touch_position(&event, &self.svg_ref) {
-                        self.last_position = Some((x, y));
-                        self.current_path.push((x, y));
-                    }
-                }
-                true
-            }
-            Msg::UpdateDrawPosition(event) => {
-                if self.is_drawing {
-                    if let Some((x, y)) = get_touch_position(&event, &self.svg_ref) {
-                        if let Some(last_pos) = self.last_position {
-                            let distance =
-                                ((x - last_pos.0).powi(2) + (y - last_pos.1).powi(2)).sqrt();
-                            if distance > 2.0 && distance < 100.0 {
-                                self.current_path.push((x, y));
-                                self.last_position = Some((x, y));
-                            }
-                        }
-                    }
-                }
+            Msg::StartDraw => {
                 true
             }
             Msg::StopDraw => {
@@ -238,8 +217,12 @@ impl Component for TreeDrawingChallenge {
                 ctx.link().send_message(Msg::CalculateScore);
                 true
             }
+            Msg::SetResultPath(path) => {
+                self.result_path= path;
+                true
+            }
             Msg::CalculateScore => {
-                self.score = Some(calculate_score(&self.current_path, &self.pattern, 20.0));
+                self.score = Some(calculate_score(&self.result_path, &self.pattern, 20.0));
                 true
             }
             Msg::UpdateTime(remaining) => {
@@ -276,18 +259,16 @@ impl Component for TreeDrawingChallenge {
                             html! { <StartScreen on_start={start_game} /> }
                         }
                         GameState::DrawingScreen => {
-                            let start_draw = ctx.link().callback(|event: TouchEvent| Msg::StartDraw(event));
-                            let update_draw = ctx.link().callback(|event: TouchEvent| Msg::UpdateDrawPosition(event));
+                            let start_draw = ctx.link().callback(|_| Msg::StartDraw);
                             let stop_draw = ctx.link().callback(|_| Msg::StopDraw);
 
                             html! {
                                 <DrawingScreen
                                     remaining_time={self.remaining_time}
                                     svg_ref={self.svg_ref.clone()}
-                                    current_path={self.current_path.clone()}
                                     on_start_draw={start_draw}
-                                    on_update_draw={update_draw}
                                     on_touch_end={stop_draw.clone()}
+                                    result_path={ctx.link().callback(|path: Vec<(f64, f64)>| Msg::SetResultPath(path))}
                                 />
                             }
                         }
@@ -297,7 +278,7 @@ impl Component for TreeDrawingChallenge {
                             html! {
                                 <ResultScreen
                                     score={self.score.unwrap_or(0)}
-                                    current_path={self.current_path.clone()}
+                                    result_path={self.result_path.clone()}
                                     on_retry={retry}
                                     remaining_time={self.remaining_time}
                                 />

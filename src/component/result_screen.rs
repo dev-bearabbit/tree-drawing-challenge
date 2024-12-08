@@ -5,7 +5,7 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct ResultScreenProps {
     pub score: u32,
-    pub current_path: Vec<(f64, f64)>, // 사용자가 그린 점의 좌표
+    pub result_path: Vec<(f64, f64)>, // 사용자가 그린 점의 좌표
     pub on_retry: Callback<MouseEvent>,
     pub remaining_time: f64,
 }
@@ -17,11 +17,12 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
     let image_url = use_state(|| None::<String>); // 업로드된 이미지 URL 상태
 
     let path_points = props
-        .current_path
+        .result_path
         .iter()
         .map(|(x, y)| format!("{},{}", x, y))
         .collect::<Vec<_>>()
         .join(" ");
+
 
     // 공유 버튼 핸들러
     let share_handler = {
