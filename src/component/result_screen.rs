@@ -15,6 +15,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
     // 상태 정의
     let is_share_section_visible = use_state(|| false); // 공유 섹션 표시 상태
     let image_url = use_state(|| None::<String>); // 업로드된 이미지 URL 상태
+    let is_processing = use_state(|| false); // 처리 상태 추가
 
     let path_points = props
         .result_path
@@ -26,11 +27,19 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
 
     // 공유 버튼 핸들러
     let share_handler = {
+        let is_processing = is_processing.clone();
         let is_share_section_visible = is_share_section_visible.clone();
         let image_url = image_url.clone();
         let score = props.score;
 
         Callback::from(move |_: MouseEvent| {
+            if *is_processing {
+                // 이미 처리 중이라면 중복 작업 방지
+                web_sys::console::log_1(&"Already processing.".into());
+                return;
+            }
+            is_processing.set(true);
+
             wasm_bindgen_futures::spawn_local({
                 let is_share_section_visible = is_share_section_visible.clone();
                 let image_url = image_url.clone();
@@ -65,15 +74,15 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                     };
 
                     // 상태 업데이트
-                    is_share_section_visible.set(true);
                     image_url.set(Some(uploaded_image_url));
+                    is_share_section_visible.set(true);
                 }
             });
         })
     };
 
     let share_to_platform = {
-        let image_url = image_url.clone(); // 상태 복사
+        let image_url = image_url.clone();
         Callback::from(move |platform: String| {
             if let Some(url) = &*image_url {
                 match platform.as_str() {
@@ -86,13 +95,10 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                     "web" => {
                         upload::share_to_web(url);
                     }
-                    "download" => {
-                        upload::share_to_download(url);
-                    }
                     _ => {}
                 }
             } else {
-                web_sys::console::error_1(&"Image URL not available.".into());
+                web_sys::console::error_1(&"Image URL not available yet.".into());
             }
         })
     };
@@ -102,8 +108,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
         <div class="screen">
             <div class="result-sentence">
                 <h3>{ "친구에게 도전장을 보내보세요!" }</h3>
-            </div>
-
+            </div>            
             <div class="score">
                 <svg class="score-background" viewBox="0 0 125 67" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -148,27 +153,30 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
 
                 </svg>
 
-                <button onclick={props.on_retry.clone()} class="retry-button">{ "↻ 다시 도전하기" }</button>
+                <button onclick={props.on_retry.clone()} class="retry-button">
+                    <img src="image/vector.png" alt="vector"/>
+                    { "다시 도전하기" }
+                </button>
 
                 <div class="timer">
                     { format_time(props.remaining_time) }
                 </div>
             </div>
-            <button class="start-button" onclick={share_handler}>{ "도전장 보내기" }</button>
-
+            <button class="start-button" onclick={share_handler} disabled={*is_processing}>
+                { if *is_processing { "조금만 기다려 주세요 🥹" } else { "도전장 보내기" } }
+             </button>
             <div id="share-section" class={if *is_share_section_visible { "share-section show" } else { "share-section hidden" }}>
                 <div class="share-container">
-                    <div class="share-text">{ "🌲 친구에게 도전장 보내기 🌲" }</div>
+                <div class="share-text">{ "🌲 친구에게 도전장 보내기 🌲" }</div>
                     <div class="icons">
                         <button class="icon-button" onclick={share_to_platform.reform(|_| "facebook".to_string())}><img src="image/facebook-icon.png" alt="Facebook"/></button>
                         <button class="icon-button" onclick={share_to_platform.reform(|_| "twitter".to_string())}><img src="image/x-icon.png" alt="Twitter" /></button>
                         <button class="icon-button" onclick={share_to_platform.reform(|_| "web".to_string())}><img src="image/link-icon.png" alt="Copy" /></button>
-                        <button class="icon-button" onclick={share_to_platform.reform(|_| "download".to_string())}><img src="image/download-icon.png" alt="Download" /></button>
                     </div>
                 </div>
             </div>
         </div>
-    }
+        }
 }
 
 // 노란색 별 SVG

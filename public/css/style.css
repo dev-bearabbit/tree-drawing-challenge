@@ -94,23 +94,23 @@ body, html {
     font-size: calc(2vw + 1.5rem);; /* 적절한 크기 설정 */
     color: white;
     text-align: center;
+    font-weight: 500;
     font-family: Pretendard;
 }
 
 .tree-container .retry-button {        
     position: absolute;
-    height: auto;
+    display: flex;
     font-size: 0.9rem;
     bottom: 12vh;
+    gap: 6px;
     color: #72F48F;
     background-color: transparent;
     cursor: pointer;
     justify-content: center;
     align-items: center;
-    display: flex;
     border: none; /* 테두리 제거 */
     outline: none; /* 포커스 시 테두리 제거 */
-    line-height: 1; /* 줄 간격 조정 */
 }
 
 .sentence {
@@ -136,13 +136,14 @@ body, html {
 
 .sentence p {
     font-size: calc(2vw + 0.5rem);
+    margin-top: calc(0.8vh);
     color: #FFFFFF99;
 }
 
 .sentence h3 {
     font-size: calc(2vw + 0.7rem);
     color: white;
-    font-weight: bold;
+    font-weight: 500;
     line-height: 1.2;
 }
 
@@ -160,18 +161,20 @@ body, html {
 .result-sentence h3 {
     font-size: calc(2vw + 0.7rem);
     color: white;
-    font-weight: bold;
+    font-weight: 500;
     line-height: 1;
 }
 
+
 .score {
     position: fixed;
+    
     z-index: 2; /* 다른 요소 위에 표시 */
 }
 
 .score .score-background {
     position: fixed; /* 배경 SVG 위치 */
-    top: 20%; /* 부모의 중앙 */
+    top: 20%;
     left: 50%; /* 부모의 중앙 */
     transform: translate(-50%, -45%); /* 정확한 중앙 정렬 */
     width: 125px; /* SVG 크기 */
@@ -192,6 +195,9 @@ body, html {
 
 .start-button {
     position: fixed;
+    display: flex; /* Flexbox 활성화 */
+    justify-content: center; /* 가로 가운데 정렬 */
+    align-items: center; /* 세로 가운데 정렬 */
     border-radius: 8px;
     padding: 16px 24px;
     font-size: 1rem;
@@ -203,8 +209,6 @@ body, html {
     font-weight: bold;
     border: none;
     cursor: pointer;
-    justify-content: center;
-    align-items: center;
 }
 
 .start-button:hover {
@@ -224,13 +228,6 @@ body, html {
     color: white;
     font-family: Pretendard, sans-serif;
     font-size: 1.5rem;
-}
-
-.alert-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #f04d4d;
-    margin-bottom: 1rem;
 }
 
 .unsupported-device p {
@@ -267,8 +264,8 @@ body, html {
 
 .icons {
     display: flex;
-    justify-content: space-around;
-    gap: 16px;
+    justify-content: center;
+    gap: 8px;
     margin-top: 16px;
 }
 
@@ -278,6 +275,7 @@ body, html {
     background: none;
     border: none;
     padding: 0;
+    margin: 0;
     cursor: pointer;
 }
 

@@ -4,7 +4,8 @@ use crate::component::start_screen::StartScreen;
 use crate::func::*;
 use crate::lottie::start_snow_animation;
 use gloo::timers::callback::{Interval, Timeout};
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsValue, JsCast};
+use wasm_bindgen::closure::Closure;
 use web_sys::{js_sys, window};
 use yew::prelude::*;
 
@@ -26,6 +27,7 @@ pub enum GameState {
     DrawingScreen,
     ResultScreen,
     UnsupportedDevice,
+    LandscapeMode, // 새로운 메시지 추가
 }
 
 pub enum Msg {
@@ -36,9 +38,24 @@ pub enum Msg {
     UpdateTime(f64),
     DetectDevice,
     SetResultPath(Vec<(f64, f64)>),
+    DetectOrientation, 
 }
 
 impl TreeDrawingChallenge {
+
+    /// 가로 모드 감지
+    fn detect_orientation(&self) -> bool {
+        if let Some(window) = window() {
+            let width = window.inner_width().unwrap().as_f64().unwrap_or(0.0);
+            let height = window.inner_height().unwrap().as_f64().unwrap_or(0.0);
+
+            // 가로 모드인지 확인
+            width > height
+        } else {
+            false
+        }
+    }
+
     /// 타이머 시작
     fn start_timer(&mut self, ctx: &Context<Self>, duration: f64) {
         let start_time = Self::get_now();
@@ -83,6 +100,7 @@ impl Component for TreeDrawingChallenge {
     }
 
     fn create(_ctx: &Context<Self>) -> Self {
+
         let points = vec![
             (130.0, 0.0),   // 트리 꼭대기
             (120.0, 16.0),
@@ -148,6 +166,18 @@ impl Component for TreeDrawingChallenge {
         let link = _ctx.link().clone();
         link.send_message(Msg::DetectDevice);
 
+        // resize 이벤트 리스너 추가
+        if let Some(window) = window() {
+            let callback = Closure::wrap(Box::new(move || {
+                link.send_message(Msg::DetectOrientation);
+            }) as Box<dyn Fn()>);
+
+            window
+                .add_event_listener_with_callback("resize", callback.as_ref().unchecked_ref())
+                .expect("Failed to add resize event listener");
+            callback.forget();
+        }
+
         Self {
             last_position: None,
             pattern: points,
@@ -165,6 +195,15 @@ impl Component for TreeDrawingChallenge {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::DetectOrientation => {
+                // 방향 감지 및 상태 변경
+                if self.detect_orientation() {
+                    self.game_state = GameState::LandscapeMode;
+                } else if self.is_mobile.unwrap_or(false) {
+                    self.game_state = GameState::StartScreen;
+                }
+                true
+            }
             Msg::DetectDevice => {
                 if let Some(window) = window() {
                     let navigator = window.navigator();
@@ -288,9 +327,18 @@ impl Component for TreeDrawingChallenge {
                             html! {
                                 <div class="unsupported-device">
                                     <div>
-                                        <p class="alert-title">{ "알림" }</p>
                                         <p>{ "이 챌린지는 터치 기반 모바일 디바이스에서만 실행 가능합니다!" }</p>
-                                        <p>{ "모바일 디바이스로 접속해주세요 :)" }</p>
+                                        <p>{ "모바일 디바이스로 접속해주세요 🥹" }</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        GameState::LandscapeMode => { 
+                            html! {
+                                <div class="unsupported-device">
+                                    <div>
+                                        <p>{ "세로 모드로 전환해주세요!" }</p>
+                                        <p>{ "화면 방향을 변경한 뒤 게임을 계속해주세요 🥹" }</p>
                                     </div>
                                 </div>
                             }
