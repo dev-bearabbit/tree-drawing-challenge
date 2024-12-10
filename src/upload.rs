@@ -1,12 +1,10 @@
 use std::cell::RefCell;
-use urlencoding::encode;
 use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
-use wasm_bindgen::{JsValue, JsCast};
+use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement, window};
 
 pub async fn render_canvas(score: u32) -> Result<String, String> {
-    web_sys::console::log_1(&"Initializing canvas...".into());
 
     let document = window()
         .ok_or("Failed to get window")?
@@ -193,83 +191,4 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
 
     url.as_string()
         .ok_or("Failed to convert URL to String".to_string())
-}
-
-
-pub fn share_to_twitter(image_url: &str) {
-
-    // 트윗 텍스트와 이미지 URL 인코딩
-    let tweet_text = format!(
-        "{}%0A{}%0A{}",
-        encode("🎄트리 그리기 챌린지🎄"),
-        encode("https://drawtree.netlify.app"),
-        encode("친구에게 도전해 보세요!")
-    );
-    let image_url_encoded = encode(image_url);
-
-    // 트위터 intent URL 생성
-    let twitter_url = format!(
-        "https://twitter.com/intent/tweet?original_referer={}&url={}&text={}",
-       image_url_encoded, image_url_encoded, tweet_text
-    );
-
-    // 현재 페이지를 트위터 링크로 리디렉션
-    if let Some(window) = window() {
-        if let Err(err) = window.location().set_href(&twitter_url) {
-            web_sys::console::error_1(&format!("Failed to redirect: {:?}", err).into());
-        }
-    } else {
-        web_sys::console::error_1(&"Window object not available.".into());
-    }
-}
-
-pub fn share_to_facebook(image_url: &str) {
-
-    // URL 인코딩
-    let image_url_encoded = encode(image_url);
-    let text = format!(
-        "{}%0A{}%0A{}",
-        encode("🎄트리 그리기 챌린지🎄"),
-        encode("https://drawtree.netlify.app"),
-        encode("친구에게 도전해 보세요!")
-    );
-    // facebook intent URL 생성
-    let facebook_url = format!(
-        "https://www.facebook.com/share.php?u={}&quote={}",
-       image_url_encoded, text
-    );
-
-    // 현재 페이지를 페이스북 링크로 리디렉션
-    if let Some(window) = window() {
-        if let Err(err) = window.location().set_href(&facebook_url) {
-            web_sys::console::error_1(&format!("Failed to redirect: {:?}", err).into());
-        }
-    } else {
-        web_sys::console::error_1(&"Window object not available.".into());
-    }
-}
-
-pub fn share_to_web(image_url: &str) {
-    let text = format!(
-        "{}\n{}\n{}",
-        "🎄트리 그리기 챌린지🎄",
-        "https://drawtree.netlify.app",
-        "친구에게 도전해 보세요!"
-    );
-    if let Some(window) = web_sys::window() {
-        let navigator = window.navigator(); // `navigator` 가져오기
-        let share_data = web_sys::ShareData::new();
-        share_data.set_url(image_url);
-        share_data.set_text(&text);
-        let share_promise = navigator.share_with_data(&share_data); // Web Share API 호출
-        let closure = Closure::once(|result: JsValue| {
-            if result.is_undefined() {
-                web_sys::console::log_1(&"Shared successfully!".into());
-            }
-        });
-        let _ = share_promise.then(&closure); // 비동기 결과 처리
-        closure.forget(); // 메모리 관리
-    } else {
-        web_sys::console::error_1(&"Web Share API not supported or Window is not available.".into());
-    }
 }

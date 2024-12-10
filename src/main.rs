@@ -3,6 +3,7 @@ mod component;
 mod func;
 mod lottie;
 mod upload;
+mod share;
 
 use app::TreeDrawingChallenge;
 

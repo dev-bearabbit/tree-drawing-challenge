@@ -1,6 +1,8 @@
 use crate::func::format_time;
 use crate::upload;
+use crate::share;
 use yew::prelude::*;
+use gloo::dialogs::alert;
 
 #[derive(Properties, PartialEq)]
 pub struct ResultScreenProps {
@@ -83,17 +85,30 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
 
     let share_to_platform = {
         let image_url = image_url.clone();
+        let score = props.score.to_string();
+
         Callback::from(move |platform: String| {
             if let Some(url) = &*image_url {
                 match platform.as_str() {
                     "facebook" => {
-                        upload::share_to_facebook(url);
+                        share::share_to_facebook(url, &score);
                     }
                     "twitter" => {
-                        upload::share_to_twitter(url);
+                        share::share_to_twitter(url, &score);
                     }
-                    "web" => {
-                        upload::share_to_web(url);
+                    "kakao" => {
+                        share::share_to_kakao(url, &score);
+                    }
+                    "link" => {
+                        let text = format!(
+                            "🎄트리 그리기 챌린지🎄\nhttps://drawtree.netlify.app\n내 점수는 {}점! 너도 도전해볼래?\n{}",
+                            score,
+                            url
+                        );
+                        let _ = Callback::from(move |_: MouseEvent| {
+                            share::copyToClipboard(&text);
+                            alert("복사 완료되었습니다! 🎉");
+                        });
                     }
                     _ => {}
                 }
@@ -154,7 +169,9 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                 </svg>
 
                 <button onclick={props.on_retry.clone()} class="retry-button">
-                    <img src="image/vector.png" alt="vector"/>
+                        <svg class="retry-icon" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin" >
+                        <path d="M12.9225 6.83334C12.5225 6.83334 12.2559 7.10001 12.2559 7.50001C12.2559 9.43334 11.2559 11.1667 9.58919 12.1C7.05586 13.5667 3.78919 12.7 2.32253 10.1667C0.855859 7.63334 1.72253 4.36668 4.25586 2.90001C6.45586 1.63334 9.12253 2.10001 10.7892 3.83334H9.18919C8.78919 3.83334 8.52253 4.10001 8.52253 4.50001C8.52253 4.90001 8.78919 5.16668 9.18919 5.16668H12.1892C12.5892 5.16668 12.8559 4.90001 12.8559 4.50001V1.50001C12.8559 1.10001 12.5892 0.833344 12.1892 0.833344C11.7892 0.833344 11.5225 1.10001 11.5225 1.50001V2.70001C10.2559 1.50001 8.65586 0.833344 6.92253 0.833344C3.25586 0.833344 0.255859 3.83334 0.255859 7.50001C0.255859 11.1667 3.25586 14.1667 6.92253 14.1667C10.5892 14.1667 13.5892 11.1667 13.5892 7.50001C13.5892 7.10001 13.3225 6.83334 12.9225 6.83334Z" fill="#72F58F"/>
+                        </svg>
                     { "다시 도전하기" }
                 </button>
 
@@ -171,7 +188,8 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                     <div class="icons">
                         <button class="icon-button" onclick={share_to_platform.reform(|_| "facebook".to_string())}><img src="image/facebook-icon.png" alt="Facebook"/></button>
                         <button class="icon-button" onclick={share_to_platform.reform(|_| "twitter".to_string())}><img src="image/x-icon.png" alt="Twitter" /></button>
-                        <button class="icon-button" onclick={share_to_platform.reform(|_| "web".to_string())}><img src="image/link-icon.png" alt="Copy" /></button>
+                        <button class="icon-button" onclick={share_to_platform.reform(|_| "kakao".to_string())}><img src="image/kakao-icon.png" alt="Kakao" /></button>
+                        <button class="icon-button" onclick={share_to_platform.reform(|_| "link".to_string())}><img src="image/link-icon.png" alt="Link" /></button>
                     </div>
                 </div>
             </div>

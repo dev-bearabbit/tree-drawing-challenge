@@ -16,7 +16,6 @@ export function loadLottieAnimationAsync() {
     }, 0); // 비동기로 실행
 }
 ")]
-
 extern "C" {
     pub fn loadLottieAnimationAsync();
 }
