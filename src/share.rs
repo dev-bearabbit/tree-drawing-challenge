@@ -1,6 +1,7 @@
 use urlencoding::encode;
 use serde_json::json;
 use web_sys::{window, console};
+use gloo::dialogs::alert;
 use wasm_bindgen::prelude::*;
 
 pub fn share_to_twitter(image_url: &str, myscore: &str) {
@@ -106,20 +107,29 @@ pub fn share_to_kakao(image_url: &str, myscore: &str) {
     shareKakao(&options);
 }
 
+pub fn copy_to_link(image_url: &str, myscore: &str) {
+    // 클립보드 API 사용
+    if let Some(window) = window() {
+        let navigator = window.navigator();
+        let clipboard = navigator.clipboard();
+        let text = format!(
+            "🎄트리 그리기 챌린지🎄\nhttps://drawtree.netlify.app\n내 점수는 {}점! 너도 도전해볼래?\n{}",
+            myscore,
+            image_url);
 
-#[wasm_bindgen(inline_js = "
-export function copyToClipboard(text) {
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            console.log('copy complete:', text);
-        })
-        .catch(err => {
-            console.error('copy failed:', err);
+        let promise = clipboard.write_text(&text); // 클립보드에 텍스트 쓰기
+        let future = wasm_bindgen_futures::JsFuture::from(promise);
+
+        wasm_bindgen_futures::spawn_local(async move {
+            match future.await {
+                Ok(_) => {
+                    web_sys::console::log_1(&"Text copied successfully!".into());
+                    alert("복사 완료되었습니다! 🎉");
+                }
+                Err(err) => {
+                    web_sys::console::log_1(&format!("Copy failed: {:?}", err).into());
+                }
+            }
         });
+    }
 }
-")]
-extern "C" {
-    pub fn copyToClipboard(text: &str);
-}
-
-

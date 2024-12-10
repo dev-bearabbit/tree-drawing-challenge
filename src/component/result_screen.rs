@@ -2,7 +2,6 @@ use crate::func::format_time;
 use crate::upload;
 use crate::share;
 use yew::prelude::*;
-use gloo::dialogs::alert;
 
 #[derive(Properties, PartialEq)]
 pub struct ResultScreenProps {
@@ -17,6 +16,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
     // 상태 정의
     let is_share_section_visible = use_state(|| false); // 공유 섹션 표시 상태
     let image_url = use_state(|| None::<String>); // 업로드된 이미지 URL 상태
+    let viewer_url = use_state(|| None::<String>); // 업로드된 이미지 URL 상태
     let is_processing = use_state(|| false); // 처리 상태 추가
 
     let path_points = props
@@ -32,6 +32,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
         let is_processing = is_processing.clone();
         let is_share_section_visible = is_share_section_visible.clone();
         let image_url = image_url.clone();
+        let viewer_url = viewer_url.clone();
         let score = props.score;
 
         Callback::from(move |_: MouseEvent| {
@@ -45,6 +46,7 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
             wasm_bindgen_futures::spawn_local({
                 let is_share_section_visible = is_share_section_visible.clone();
                 let image_url = image_url.clone();
+                let viewer_url = viewer_url.clone();
 
                 async move {
                     web_sys::console::log_1(&"Starting canvas rendering...".into());
@@ -64,10 +66,10 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                     web_sys::console::log_1(&"Starting image upload...".into());
 
                     // 이미지 업로드
-                    let uploaded_image_url = match upload::upload_image(&data_url).await {
-                        Ok(image_url) => {
+                    let (upload_image_url, image_viewer_url) = match upload::upload_image(&data_url).await {
+                        Ok((image_url, viewer_url)) => {
                             web_sys::console::log_1(&"Image uploaded successfully.".into());
-                            image_url
+                            (image_url, viewer_url)
                         }
                         Err(err) => {
                             web_sys::console::error_1(&format!("Upload error: {}", err).into());
@@ -76,7 +78,8 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                     };
 
                     // 상태 업데이트
-                    image_url.set(Some(uploaded_image_url));
+                    image_url.set(Some(upload_image_url));
+                    viewer_url.set(Some(image_viewer_url));
                     is_share_section_visible.set(true);
                 }
             });
@@ -84,11 +87,12 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
     };
 
     let share_to_platform = {
-        let image_url = image_url.clone();
+        let kakao_url = image_url.as_ref().map(|url| url.clone()).unwrap_or_default();
+        let viewer_url = viewer_url.clone();
         let score = props.score.to_string();
 
         Callback::from(move |platform: String| {
-            if let Some(url) = &*image_url {
+            if let Some(url) = &*viewer_url {
                 match platform.as_str() {
                     "facebook" => {
                         share::share_to_facebook(url, &score);
@@ -97,18 +101,10 @@ pub fn result_screen(props: &ResultScreenProps) -> Html {
                         share::share_to_twitter(url, &score);
                     }
                     "kakao" => {
-                        share::share_to_kakao(url, &score);
+                        share::share_to_kakao(&kakao_url, &score);
                     }
                     "link" => {
-                        let text = format!(
-                            "🎄트리 그리기 챌린지🎄\nhttps://drawtree.netlify.app\n내 점수는 {}점! 너도 도전해볼래?\n{}",
-                            score,
-                            url
-                        );
-                        let _ = Callback::from(move |_: MouseEvent| {
-                            share::copyToClipboard(&text);
-                            alert("복사 완료되었습니다! 🎉");
-                        });
+                        share::copy_to_link(url, &score);
                     }
                     _ => {}
                 }

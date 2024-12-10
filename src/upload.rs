@@ -153,7 +153,7 @@ pub async fn render_canvas(score: u32) -> Result<String, String> {
 }
 
 
-pub async fn upload_image(data_url: &str) -> Result<String, String> {
+pub async fn upload_image(data_url: &str) -> Result<(String, String), String> {
     let api_key = "KEY";
     let base64_image = data_url.split(',').nth(1).ok_or("Invalid data URL")?;
 
@@ -185,10 +185,12 @@ pub async fn upload_image(data_url: &str) -> Result<String, String> {
         .await
         .map_err(|_| "Failed to parse ImgBB response")?;
 
-    let url = js_sys::Reflect::get(&json, &"data".into())
-        .and_then(|data| js_sys::Reflect::get(&data, &"url_viewer".into()))
-        .map_err(|_| "Failed to extract URL from ImgBB response")?;
+        let data = js_sys::Reflect::get(&json, &"data".into()).unwrap();
+        let url_viewer = js_sys::Reflect::get(&data, &"url_viewer".into()).unwrap()
+        .as_string().ok_or_else(|| "url_viewer is not a string".to_string())?;
+        let url = js_sys::Reflect::get(&data, &"url".into()).unwrap()
+        .as_string().ok_or_else(|| "url_viewer is not a string".to_string())?;
 
-    url.as_string()
-        .ok_or("Failed to convert URL to String".to_string())
+    Ok((url, url_viewer))
 }
+

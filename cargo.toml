@@ -39,5 +39,6 @@ features = ["console",
             "HtmlImageElement",
             "ShareData",
             "MediaQueryList",
-            "TextMetrics"
+            "TextMetrics",
+            "Clipboard"
             ]
