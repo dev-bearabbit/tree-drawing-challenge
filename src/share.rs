@@ -131,5 +131,5 @@ pub fn copy_to_link(image_url: &str, myscore: &str) {
                 }
             }
         });
-    }
+        }
 }

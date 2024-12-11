@@ -261,7 +261,7 @@ impl Component for TreeDrawingChallenge {
                 true
             }
             Msg::CalculateScore => {
-                self.score = Some(calculate_score(&self.result_path, &self.pattern, 20.0));
+                self.score = Some(calculate_score(&self.result_path, &self.pattern, 15.0));
                 true
             }
             Msg::UpdateTime(remaining) => {
