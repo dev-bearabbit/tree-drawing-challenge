@@ -41,20 +41,6 @@ Enjoy the simplicity and challenge of this fun Christmas-themed drawing experien
 환영합니다! 버그 리포트, 기능 제안, 풀 리퀘스트 등 다양한 방식으로 프로젝트에 참여해주세요.  
 Contributions are welcome! Participate in various ways such as reporting bugs, suggesting features, or submitting pull requests.  
 
-1. 저장소를 포크(Fork)합니다.
-1. Fork the repository.
-
-2. 새로운 브랜치를 생성합니다.
-2. Create a new branch.
-    ```bash
-    git checkout -b feature/new-feature
-    ```
-
-
-## 기여하기
-
-기여를 환영합니다! 버그 리포트, 기능 제안, 풀 리퀘스트 등 다양한 방식으로 프로젝트에 참여해주세요.
-
 1. Fork the repository.
 2. Create a new branch:
 
